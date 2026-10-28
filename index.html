@@ -138,7 +138,7 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(44px,9vw,92px);lin
     <div class="rules fade">
       <div><b>Listen</b>Headphones recommended. Each room plays one piece, then goes dark.</div>
       <div><b>Look</b>Each room is lit by its piece. The light moves with the sound.</div>
-      <div><b>Read</b>The wall label fades after a few seconds. Move to bring it back.</div>
+      <div><b>Play</b>Touch or drag in any room. The wall label steps aside while you play and comes back when you stop.</div>
     </div>
   </div>
 </section>
@@ -269,10 +269,10 @@ let uiTimer;
 function showUI(){
   if(state!=='playing')return;
   ['label','controls','time','scrim'].forEach(id=>$(id).classList.remove('hide'));
-  clearTimeout(uiTimer);uiTimer=setTimeout(hideUI,6000);
+  clearTimeout(uiTimer);
 }
 function hideUI(){
-  if(state!=='playing'||au.paused)return;
+  if(state!=='playing')return;
   ['label','controls','time','scrim'].forEach(id=>$(id).classList.add('hide'));
 }
 
@@ -602,11 +602,12 @@ const INST={
 let dragging=false,downAt=null;
 cv.addEventListener('pointerdown',e=>{
   if(state!=='playing'||!cur)return;dragging=true;downAt={x:e.clientX,y:e.clientY};
+  clearTimeout(uiTimer);hideUI(); // step aside while the visitor plays
   try{cv.setPointerCapture(e.pointerId)}catch(_){}
   cur.onDown&&cur.onDown(e.clientX,e.clientY);
 });
 cv.addEventListener('pointermove',e=>{if(state==='playing'&&cur&&dragging&&cur.onDrag)cur.onDrag(e.clientX,e.clientY)});
-const pUp=e=>{if(!dragging)return;dragging=false;const tap=downAt?Math.hypot(e.clientX-downAt.x,e.clientY-downAt.y)<10:false;cur&&cur.onUp&&cur.onUp(e.clientX,e.clientY,tap)};
+const pUp=e=>{if(!dragging)return;dragging=false;clearTimeout(uiTimer);uiTimer=setTimeout(showUI,1200);const tap=downAt?Math.hypot(e.clientX-downAt.x,e.clientY-downAt.y)<10:false;cur&&cur.onUp&&cur.onUp(e.clientX,e.clientY,tap)};
 cv.addEventListener('pointerup',pUp);cv.addEventListener('pointercancel',pUp);
 
 /* ---------- exhibition flow ---------- */
