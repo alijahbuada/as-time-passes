@@ -1,0 +1,760 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>as time passes</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="as time passes — an exhibition of fourteen pieces by Alijah Jacob, heard one room at a time.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500&family=Zen+Kaku+Gothic+New:wght@300;400;500&display=swap">
+<style>
+/* Layout: a black box. One full-screen canvas per room, museum wall label pinned bottom-left,
+   hairline progress along the floor. Light only appears where the visitor carries it or waits. */
+:root{
+  --void:#050505;          /* the room */
+  --wall:#0c0c0b;          /* label ground */
+  --light:#ece8e1;         /* installation light, slightly warm */
+  --dim:#8d8a84;           /* secondary label text */
+  --faint:#3a3936;         /* hairlines */
+  --ticket:#ece6da;        /* ticket stock */
+  --ink:#141312;           /* ticket ink */
+  --display:"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho",Georgia,serif;
+  --label:"Zen Kaku Gothic New","Hiragino Sans","Helvetica Neue",Arial,sans-serif;
+  color-scheme:dark;
+}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%;background:var(--void);color:var(--light)}
+body{font-family:var(--label);font-weight:300;overflow:hidden;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible,a:focus-visible{outline:1px solid var(--light);outline-offset:4px}
+a{color:inherit}
+.view{position:fixed;inset:0;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* ---------- entrance ---------- */
+#entrance{display:flex;align-items:center;overflow-y:auto}
+.entry{width:min(100%,560px);margin-inline:auto;display:grid;gap:22px;padding-block:40px;justify-items:center;text-align:center;transition:opacity 1.2s ease,filter 1.2s ease,transform 1.4s ease}
+.entry.gone{opacity:0;filter:blur(8px);transform:scale(1.04)}
+.clock{width:min(64vw,300px);max-width:100%;aspect-ratio:1;border-radius:50%;padding:0;transition:transform .8s ease}
+.clock:hover{transform:scale(1.02)}
+.clock:focus-visible{outline-offset:10px}
+.clock svg{width:100%;height:100%;display:block;overflow:visible}
+.press{font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--dim);margin-top:-6px}
+.entry .rules{text-align:left;width:100%;margin-top:10px}
+.eyebrow{font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--dim)}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(44px,9vw,92px);line-height:1;letter-spacing:-.01em;margin:0;text-wrap:balance}
+.byline{font-size:15px;color:var(--dim);letter-spacing:.04em}
+.note{font-size:15px;line-height:1.8;max-width:60ch;color:var(--light);margin:0}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px 24px;border-top:1px solid var(--faint);padding-top:20px;font-size:13px;color:var(--dim);line-height:1.6}
+.rules b{display:block;font-weight:500;color:var(--light);font-size:12px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:4px}
+.enter{justify-self:start;display:inline-flex;align-items:center;gap:14px;border:1px solid var(--light);padding:14px 28px;font-size:13px;letter-spacing:.3em;text-transform:uppercase;transition:background .4s,color .4s}
+.enter:hover{background:var(--light);color:var(--void)}
+.entry .fade{animation:rise 2.4s ease both}
+.entry .fade:nth-child(2){animation-delay:.3s}.entry .fade:nth-child(3){animation-delay:.6s}.entry .fade:nth-child(4){animation-delay:.9s}.entry .fade:nth-child(5){animation-delay:1.2s}.entry .fade:nth-child(6){animation-delay:1.5s}
+@keyframes rise{from{opacity:.15;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ---------- room ---------- */
+#room{padding:0}
+#cv{position:absolute;inset:0;width:100%;height:100%;display:block;transition:opacity 1.6s ease;touch-action:none;cursor:crosshair}
+#room.dark #cv{opacity:0}
+.label{position:absolute;left:max(20px,env(safe-area-inset-left,0px));bottom:calc(28px + env(safe-area-inset-bottom,0px));
+  width:min(340px,calc(100% - 40px));display:grid;gap:6px;transition:opacity 1.2s ease;pointer-events:none}
+.label.hide{opacity:0}
+.label.onlight{background:rgba(5,5,5,.62);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);padding:14px 16px;margin-left:-16px;margin-bottom:-14px}
+.label .num{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--dim);font-variant-numeric:tabular-nums}
+.label .t{font-family:var(--display);font-size:24px;line-height:1.2;margin:2px 0 0}
+.label .meta{font-size:12px;color:var(--dim);line-height:1.6}
+.label .st{font-size:13px;line-height:1.65;margin:6px 0 0;color:var(--light)}
+.label .attr{font-size:12px;color:var(--dim);margin:-2px 0 0}
+.label .temp{display:inline-block;font-size:10px;letter-spacing:.2em;text-transform:uppercase;border:1px solid var(--faint);color:var(--dim);padding:1px 6px;margin-top:4px;justify-self:start}
+.label .hint{font-size:12px;color:var(--light);margin-top:4px;opacity:.85}
+.controls{position:absolute;top:calc(16px + env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px));display:flex;gap:6px;transition:opacity 1.2s ease}
+.controls.hide{opacity:0}
+.controls button{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--dim);padding:10px 12px}
+.controls button:hover{color:var(--light)}
+.floor{position:absolute;left:0;right:0;bottom:env(safe-area-inset-bottom,0px);height:1px;background:var(--faint)}
+.floor i{position:absolute;inset:0 auto 0 0;width:0;background:var(--dim)}
+.time{position:absolute;right:max(20px,env(safe-area-inset-right,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));font-size:11px;color:var(--dim);font-variant-numeric:tabular-nums;letter-spacing:.1em;transition:opacity 1.2s}
+.time.hide{opacity:0}
+
+/* threshold between rooms */
+.door{position:absolute;inset:0;display:grid;place-content:center;gap:18px;text-align:center;padding-inline:max(16px,env(safe-area-inset-left,0px));opacity:0;pointer-events:none;transition:opacity 1.6s ease}
+.door.show{opacity:1;pointer-events:auto}
+.door .num{font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--dim)}
+.door .t{font-family:var(--display);font-size:clamp(28px,5vw,44px);margin:0}
+.door .enter{justify-self:center}
+.door .back{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--dim);padding:8px}
+.door .back:hover{color:var(--light)}
+
+/* ---------- exit ---------- */
+#exit{overflow-y:auto}
+.exitwrap{width:min(100%,980px);margin-inline:auto;padding-block:56px 72px;display:grid;gap:40px}
+.exitwrap h2{font-family:var(--display);font-weight:400;font-size:clamp(36px,6vw,60px);margin:0;line-height:1.05}
+.exitgrid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:40px;align-items:start}
+@media (max-width:760px){.exitgrid{grid-template-columns:minmax(0,1fr)}}
+.ticketbox{display:grid;gap:14px}
+#ticketImg{width:100%;height:auto;display:block;box-shadow:0 30px 60px -30px rgba(0,0,0,.9)}
+.tbtns{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.tbtns .enter{padding:12px 20px;font-size:12px}
+.small{font-size:12px;color:var(--dim);line-height:1.6;margin:0}
+.credits{display:grid;gap:22px;font-size:14px;line-height:1.7}
+.credits h3{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--dim);font-weight:400;margin:0 0 6px}
+.credits ol{margin:0;padding:0;list-style:none;display:grid;gap:2px;font-variant-numeric:tabular-nums}
+.credits li{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid #1a1a18;padding:5px 0}
+.credits li span:last-child{color:var(--dim)}
+.links{display:flex;flex-wrap:wrap;gap:8px 20px}
+.links a{text-decoration:none;border-bottom:1px solid var(--faint);padding-bottom:2px}
+.links a:hover{border-color:var(--light)}
+
+@media (max-width:520px){.label .t{font-size:20px}.label .st{font-size:12.5px}.controls button{padding:10px 8px}}
+@media (prefers-reduced-motion:reduce){.entry .fade{animation:none}#cv,.label,.door{transition-duration:.3s}}
+</style>
+
+<audio id="au" preload="auto"></audio>
+
+<section id="entrance" class="view" aria-label="Entrance">
+  <div class="entry" id="entry">
+    <button class="clock fade" id="clockBtn" aria-label="Press the clock to enter the exhibition">
+      <svg viewBox="-110 -110 220 220" aria-hidden="true">
+        <circle r="104" fill="none" stroke="#3a3936" stroke-width="1"/>
+        <g id="ticks"></g>
+        <line id="hH" x1="0" y1="10" x2="0" y2="-50" stroke="#ece8e1" stroke-width="3" stroke-linecap="round"/>
+        <line id="hM" x1="0" y1="14" x2="0" y2="-80" stroke="#ece8e1" stroke-width="1.6" stroke-linecap="round"/>
+        <line id="hS" x1="0" y1="20" x2="0" y2="-92" stroke="#8d8a84" stroke-width=".8"/>
+        <circle r="3" fill="#ece8e1"/>
+      </svg>
+    </button>
+    <div class="press fade" id="press">Press the clock to enter</div>
+    <div class="eyebrow fade">An exhibition in fourteen rooms</div>
+    <h1 class="fade" id="exTitle">as time passes</h1>
+    <div class="byline fade" id="exBy">Alijah Jacob · 14 pieces · 17 minutes</div>
+    <p class="note fade" id="exNote"></p>
+    <div class="rules fade">
+      <div><b>Listen</b>Headphones recommended. Each room plays one piece, then goes dark.</div>
+      <div><b>Look</b>Each room is lit by its piece. The light moves with the sound.</div>
+      <div><b>Read</b>The wall label fades after a few seconds. Move to bring it back.</div>
+    </div>
+  </div>
+</section>
+
+<section id="room" class="view" aria-label="Exhibition room" hidden>
+  <canvas id="cv"></canvas>
+  <div class="label" id="label" aria-live="polite">
+    <div class="num" id="lNum"></div>
+    <h2 class="t" id="lTitle"></h2>
+    <div class="meta" id="lMeta"></div>
+    <p class="st" id="lSt"></p>
+    <p class="attr" id="lAttr" hidden></p>
+    <span class="temp" id="lTemp">Placeholder wall text</span>
+    <div class="hint" id="lHint" hidden></div>
+  </div>
+  <div class="controls" id="controls">
+    <button id="homeBtn">← Entrance</button>
+    <button id="pauseBtn" aria-label="Pause">Pause</button>
+    <button id="skipBtn">Next room →</button>
+  </div>
+  <div class="time" id="time"></div>
+  <div class="floor"><i id="prog"></i></div>
+  <div class="door" id="door">
+    <div class="num" id="dNum"></div>
+    <h2 class="t" id="dTitle"></h2>
+    <button class="enter" id="dBtn">Enter next room</button>
+    <button class="back" id="dHome">Back to entrance</button>
+  </div>
+</section>
+
+<section id="exit" class="view" aria-label="Exit" hidden>
+  <div class="exitwrap">
+    <div style="display:grid;gap:12px">
+      <div class="eyebrow">Exit</div>
+      <h2>until next time</h2>
+    </div>
+    <div class="exitgrid">
+      <div class="ticketbox">
+        <img id="ticketImg" alt="Your ticket stub for this visit, with the date, time spent in each room, and the shape of what you heard.">
+        <div class="tbtns">
+          <button class="enter" id="dlBtn">Save ticket</button>
+          <button class="enter" id="againBtn">Walk again</button>
+        </div>
+        <p class="small" id="dlNote">Your ticket is made from this visit: the time you spent in each room and the sound you heard there. If the save button does nothing here, right-click or long-press the ticket to save it.</p>
+      </div>
+      <div class="credits">
+        <div>
+          <h3>Pieces</h3>
+          <ol id="creditList"></ol>
+        </div>
+        <div>
+          <h3>Listen and follow</h3>
+          <div class="links" id="links"></div>
+        </div>
+        <p class="small">All music by Alijah Jacob.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="rooms.js"></script>
+<script>
+(()=>{
+const EX=window.EXHIBITION, ROOMS=window.ROOMS;
+const $=id=>document.getElementById(id);
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const fmt=s=>{s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+const pad=n=>String(n).padStart(2,'0');
+
+/* ---------- entrance copy ---------- */
+$('exTitle').textContent=EX.title;
+const totalDur=ROOMS.reduce((a,r)=>a+r.duration,0);
+$('exBy').textContent=`${EX.artist} · ${ROOMS.length} pieces · ${Math.round(totalDur/60)} minutes`;
+$('exNote').textContent=EX.note;
+
+/* ---------- audio graph ---------- */
+const au=$('au');
+let actx,analyser,master,freq,wave;
+function initAudio(){
+  if(actx)return;
+  actx=new (window.AudioContext||window.webkitAudioContext)();
+  analyser=actx.createAnalyser();analyser.fftSize=2048;analyser.smoothingTimeConstant=.75;
+  master=actx.createGain();
+  const src=actx.createMediaElementSource(au);
+  src.connect(master);master.connect(analyser);analyser.connect(actx.destination);
+  freq=new Uint8Array(analyser.frequencyBinCount);wave=new Uint8Array(analyser.fftSize);
+}
+const A={level:0,bass:0,mid:0,high:0,onset:0,avg:0,_prev:0};
+function readAudio(){
+  if(!analyser){A.level*=.95;return}
+  analyser.getByteFrequencyData(freq);analyser.getByteTimeDomainData(wave);
+  let s=0;for(let i=0;i<wave.length;i++){const v=(wave[i]-128)/128;s+=v*v}
+  const rms=Math.min(1,Math.sqrt(s/wave.length)*3.2);
+  const hz=actx.sampleRate/analyser.fftSize, band=(a,b)=>{let t=0,n=0;for(let i=Math.floor(a/hz);i<Math.ceil(b/hz);i++){t+=freq[i];n++}return n?t/n/255:0};
+  A.level+= (rms-A.level)*.25;
+  A.bass += (band(30,180)-A.bass)*.3;
+  A.mid  += (band(180,2000)-A.mid)*.3;
+  A.high += (band(2000,9000)-A.high)*.3;
+  A.avg  += (A.level-A.avg)*.02;
+  const jump=rms-A._prev; A._prev=rms;
+  A.onset = (jump>.05 && rms>A.avg*1.15)?1:A.onset*.9;
+}
+
+/* ---------- canvas + lantern / stillness ---------- */
+const cv=$('cv'),ctx=cv.getContext('2d');
+const layer=document.createElement('canvas'),lx=layer.getContext('2d');
+let W=0,H=0,DPR=1;
+function resize(){
+  DPR=Math.min(2,window.devicePixelRatio||1);
+  W=cv.clientWidth;H=cv.clientHeight;
+  for(const c of [cv,layer]){c.width=Math.round(W*DPR);c.height=Math.round(H*DPR)}
+  ctx.setTransform(DPR,0,0,DPR,0,0);lx.setTransform(DPR,0,0,DPR,0,0);
+  lx.fillStyle='#000';lx.fillRect(0,0,W,H);
+  if(cur&&cur.resize)cur.resize();
+}
+const P={x:innerWidth/2,y:innerHeight/2,lastMove:performance.now(),still:0,uiShown:true};
+function onMove(e){
+  const nx=e.clientX,ny=e.clientY;
+  if(Math.hypot(nx-P.x,ny-P.y)>2){P.lastMove=performance.now()}
+  P.x=nx;P.y=ny;P.type=e.pointerType;P.inside=true;if(!dragging)showUI();
+}
+addEventListener('pointermove',onMove,{passive:true});
+document.documentElement.addEventListener('mouseleave',()=>{P.inside=false});
+addEventListener('pointerdown',onMove,{passive:true});
+addEventListener('keydown',e=>{P.lastMove=performance.now();showUI()});
+let uiTimer;
+function showUI(){
+  if(state!=='playing')return;
+  $('label').classList.remove('hide');$('controls').classList.remove('hide');$('time').classList.remove('hide');
+  clearTimeout(uiTimer);uiTimer=setTimeout(hideUI,6000);
+}
+function hideUI(){
+  if(state!=='playing'||au.paused)return;
+  $('label').classList.add('hide');$('controls').classList.add('hide');$('time').classList.add('hide');
+}
+
+/* ---------- small helpers for renderers ---------- */
+const LIGHT='236,232,225';
+const rand=(a=1,b)=>b===undefined?Math.random()*a:a+Math.random()*(b-a);
+function fade(a){lx.fillStyle=`rgba(0,0,0,${a})`;lx.fillRect(0,0,W,H)}
+function clear(){lx.fillStyle='#000';lx.fillRect(0,0,W,H)}
+const glowSprite=(()=>{const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d');const r=g.createRadialGradient(64,64,0,64,64,64);r.addColorStop(0,'rgba(255,255,255,1)');r.addColorStop(.4,'rgba(255,255,255,.25)');r.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=r;g.fillRect(0,0,128,128);return c})();
+const fogSprite=(()=>{const c=document.createElement('canvas');c.width=c.height=256;const g=c.getContext('2d');const r=g.createRadialGradient(128,128,0,128,128,128);r.addColorStop(0,'rgba(236,232,225,.55)');r.addColorStop(1,'rgba(236,232,225,0)');g.fillStyle=r;g.fillRect(0,0,256,256);return c})();
+const progress=()=>au.duration?Math.min(1,au.currentTime/au.duration):0;
+
+/* ---------- installations ---------- */
+/* ---------- playable notes, tuned per room to the key measured from each track ---------- */
+const SC=(pc,mode)=>{const iv=mode==='major'?[0,2,4,7,9]:[0,3,5,7,10],o=[];for(let oct=3;oct<=5;oct++)for(const i of iv)o.push(12*(oct+1)+pc+i);return o};
+const pick=(sc,y)=>sc[Math.max(0,Math.min(sc.length-1,Math.floor((1-y/H)*sc.length)))];
+function tone(midi,x,o={}){
+  if(!actx)return;const f=440*Math.pow(2,(midi-69)/12),now=actx.currentTime,dur=o.dur||2.4,vol=o.vol||.12;
+  const g=actx.createGain();g.gain.setValueAtTime(0,now);g.gain.linearRampToValueAtTime(vol,now+(o.attack||.01));g.gain.exponentialRampToValueAtTime(.0001,now+dur);
+  (o.partials||[[1,1],[2.76,.25],[5.4,.08]]).forEach(([m,a])=>{const os=actx.createOscillator(),og=actx.createGain();os.type=o.type||'sine';os.frequency.value=f*m;og.gain.value=a;os.connect(og);og.connect(g);os.start(now);os.stop(now+dur+.05)});
+  let out=g;if(actx.createStereoPanner){const p=actx.createStereoPanner();p.pan.value=Math.max(-.8,Math.min(.8,((x??W/2)/W)*1.6-.8));g.connect(p);out=p}
+  out.connect(master);
+}
+/* is the visitor's pointer in the room right now (a hovering mouse, or a finger held down) */
+const pointerIn=()=>dragging||(P.type==='mouse'&&P.inside);
+
+const HINTS={
+  rain:'Tap to let a drop fall. Drag to make it rain.',
+  column:'Drag to move the light. Tap it to tear it down.',
+  hooked:'Press and pull the line. Let go.',
+  static:'Touch the static to calm it.',
+  words:'Run through the words. Tap to let them go.',
+  sunset:'Drag the sun to hold it up a little longer.',
+  fog:'Drag to part the fog. Tap to let the sunlight in.',
+  wind:'Tap anywhere to hang a chime. Higher on the screen, higher the note.',
+  constellation:'Tap to place a star of your own.',
+  rebirth:'Tap to begin again, anywhere.',
+  carve:'Tap the drawn line to go back to that moment. You can’t go forward.',
+  shrine:'Tap the water to let a drop fall.',
+  sky:'Drag sideways to move both skies through the day.',
+  door:'Press and hold to keep the door open.'
+};
+
+const INST={
+  /* 01 rain on dark water */
+  rain(){
+    let rip=[],lastDrag=0;const sc=SC(2,'minor'); // D minor
+    const drop=(x,y,big)=>{const hz=H*.36;rip.push({x,y:Math.max(y,hz+12),r:0,max:big?rand(130,210):rand(40,90),a:1})};
+    return{
+      onDown(x,y){drop(x,y,true);tone(pick(sc,y),x,{vol:.09,dur:1.8,partials:[[1,1],[3.01,.06]]})},
+      onDrag(x,y){const n=performance.now();if(n-lastDrag>70){lastDrag=n;drop(x+rand(-30,30),y+rand(-20,20),false)}},
+      draw(t){
+        clear();const hz=H*.36;
+        lx.strokeStyle=`rgba(${LIGHT},.12)`;lx.lineWidth=1;lx.beginPath();lx.moveTo(0,hz);lx.lineTo(W,hz);lx.stroke();
+        if(Math.random()<.12+A.level*.9) rip.push({x:rand(W),y:rand(hz+10,H),r:0,max:rand(30,90)*(.6+A.level),a:.5+A.level*.5});
+        if(A.onset>.95) for(let i=0;i<3;i++) rip.push({x:rand(W),y:rand(hz+10,H),r:0,max:rand(80,180),a:.9});
+        rip=rip.filter(p=>p.r<p.max);
+        for(const p of rip){const depth=(p.y-hz)/(H-hz),k=1-p.r/p.max;p.r+=.6+depth*1.2;
+          lx.strokeStyle=`rgba(${LIGHT},${p.a*k*(.25+depth*.75)})`;lx.beginPath();lx.ellipse(p.x,p.y,p.r*(.4+depth),p.r*(.12+depth*.22),0,0,Math.PI*2);lx.stroke()}
+      }}
+  },
+  /* 02 a column of light you can move, and tear down */
+  column(){
+    let cx=W/2,tx=W/2,tearT=-1e9,seeds=[];
+    return{
+      onDrag(x){tx=x},
+      onUp(x,y,tap){
+        if(tap&&Math.abs(x-cx)<90){tearT=performance.now();seeds=Array.from({length:16},()=>({dx:rand(-1,1),r:rand(.5,1.4)}));
+          tone(40,x,{vol:.14,dur:3.5,attack:.02,partials:[[1,1],[1.5,.4],[2,.2]]})}
+      },
+      draw(t){
+        fade(.25);cx+=(tx-cx)*.08;
+        const k=Math.min(1,(performance.now()-tearT)/3200),amp=Math.pow(1-k,2)*Math.min(W*.35,260);
+        const w=2+A.bass*70,b=.25+A.level*.9,segH=H/16;
+        for(let i=0;i<16;i++){
+          const s=seeds[i],x=cx+(s?s.dx*amp*s.r:0),y=i*segH, gw=w*3;
+          const g=lx.createLinearGradient(x-gw,0,x+gw,0);
+          g.addColorStop(0,`rgba(${LIGHT},0)`);g.addColorStop(.5,`rgba(${LIGHT},${b})`);g.addColorStop(1,`rgba(${LIGHT},0)`);
+          lx.fillStyle=g;lx.fillRect(x-gw,y,gw*2,segH-(amp>1?2:0));
+          lx.fillStyle=`rgba(${LIGHT},${.5+A.level*.5})`;lx.fillRect(x-.75,y,1.5,segH-(amp>1?2:0));
+        }
+        const y=H*(1-progress()*.7)-H*.05;lx.fillStyle=`rgba(${LIGHT},${.18+A.mid*.3})`;lx.fillRect(0,y,W,1);
+      }}
+  },
+  /* 03 a line pulled taut, that the visitor can pull */
+  hooked(){
+    let lure=0,vel=0,held=false,fx=0,fy=0,rx=W/2;
+    return{
+      onDown(x,y){held=true;fx=x;fy=y},onDrag(x,y){fx=x;fy=y},
+      onUp(){if(held){held=false;tone(60,fx,{vol:.08,dur:1.2,type:'triangle',partials:[[1,1]]})}},
+      draw(t){
+        fade(.18);const y0=H*.42;let cx,cy;
+        if(held){cx=2*fx-W/2;cy=2*fy-y0;lure=fy-y0;vel=0;rx=fx}
+        else{const target=A.bass*H*.28+(A.onset>.9?H*.12:0);vel+=(target-lure)*.08;vel*=.82;lure+=vel;rx+=(W*(.5+Math.sin(t*.0004)*.12)-rx)*.05;cx=rx;cy=y0+lure*2}
+        lx.strokeStyle=`rgba(${LIGHT},${.55+A.level*.45})`;lx.lineWidth=1.2;
+        lx.beginPath();lx.moveTo(-10,y0);lx.quadraticCurveTo(cx,cy,W+10,y0);lx.stroke();
+        const lxp=held?fx:rx,ly=held?fy:y0+lure;lx.drawImage(glowSprite,lxp-14,ly-14,28,28);
+        lx.strokeStyle=`rgba(${LIGHT},.25)`;lx.beginPath();lx.moveTo(lxp,ly);lx.lineTo(lxp,ly+30+A.level*80);lx.stroke();
+      }}
+  },
+  /* 04 static that takes a shape; touching it calms it */
+  static(){
+    const s=document.createElement('canvas'),g=s.getContext('2d');let img,calm=0;
+    function size(){s.width=Math.max(1,Math.ceil(W/5));s.height=Math.max(1,Math.ceil(H/5));img=g.createImageData(s.width,s.height)}
+    size();
+    return{resize:size,draw(t){
+      calm+=((pointerIn()?1:0)-calm)*.06;
+      const d=img.data,sw=s.width,sh=s.height,T=t*.0006,amt=.15+A.level*.85,shape=1-Math.min(1,A.level*2.2);
+      const px=P.x/W*sw,py=P.y/H*sh,cr=Math.max(sw,sh)*.16;
+      for(let y=0;y<sh;y++)for(let x=0;x<sw;x++){
+        const nx=x/sw-.5,ny=y/sh-.5;
+        const field=.5+.5*Math.sin(nx*9+T)*Math.cos(ny*7-T*.8)+.4*Math.sin(Math.hypot(nx,ny)*18-T*2);
+        const form=Math.max(0,1-Math.hypot(nx*1.4,ny*1.1+Math.sin(T)*.05)*2.6)*shape;
+        const dd=Math.hypot(x-px,y-py)/cr, quiet=calm*Math.max(0,1-dd*dd); // 1 at the finger, 0 outside
+        let v=(Math.random()*amt*(.5+.5*field)+form*.55*Math.random())*(1-quiet);
+        v=Math.min(255,v*255);const i=(y*sw+x)*4;d[i]=v;d[i+1]=v*.98;d[i+2]=v*.95;d[i+3]=255;
+      }
+      g.putImageData(img,0,0);lx.imageSmoothingEnabled=false;lx.drawImage(s,0,0,W,H);lx.imageSmoothingEnabled=true;
+      if(calm>.02){const r=Math.min(W,H)*.06;lx.globalAlpha=calm*.8;lx.drawImage(glowSprite,P.x-r*2,P.y-r*2,r*4,r*4);lx.globalAlpha=1;
+        lx.strokeStyle=`rgba(${LIGHT},${calm*.6})`;lx.beginPath();lx.arc(P.x,P.y,r*.55,0,Math.PI*2);lx.stroke()}
+    }}
+  },
+  /* 05 the title in light, coming apart; the visitor can run through it */
+  words(){
+    let pts=[],bloom=0;const sc=SC(5,'minor'); // F minor
+    function build(){
+      const c=document.createElement('canvas'),g=c.getContext('2d');c.width=Math.ceil(W);c.height=Math.ceil(H);
+      const tall=W<H*.8,fs=tall?Math.min(W*.24,H*.11):Math.min(W*.11,H*.22);g.fillStyle='#fff';g.textAlign='center';g.textBaseline='middle';
+      g.font=`400 ${fs}px "Shippori Mincho", Georgia, serif`;
+      if(tall)['more','than','words'].forEach((w,i)=>g.fillText(w,W/2,H*.4+(i-1)*fs*1.05));else g.fillText('more than words',W/2,H*.45);
+      const data=g.getImageData(0,0,c.width,c.height).data,step=Math.max(3,Math.round(fs/26));pts=[];
+      for(let y=0;y<c.height;y+=step)for(let x=0;x<c.width;x+=step)if(data[(y*c.width+x)*4+3]>128)pts.push({hx:x,hy:y,x,y,a:rand(Math.PI*2),s:rand(.5,1.5)});
+    }
+    build();
+    return{resize:build,
+      onUp(x,y,tap){if(tap){bloom=1;[0,2,4].forEach((k,i)=>setTimeout(()=>tone(sc[5+k],x,{vol:.07,dur:2.6}),i*90))}},
+      draw(t){
+        fade(.3);bloom*=.97;const spread=A.level*A.level*W*.25+A.onset*20+bloom*W*.35,T=t*.001,on=pointerIn(),R=Math.min(W,H)*.14;
+        lx.fillStyle=`rgba(${LIGHT},.85)`;
+        for(const p of pts){
+          const ang=p.a+Math.sin(T+p.hx*.01)*1.5;let tx=p.hx+Math.cos(ang)*spread*p.s,ty=p.hy+Math.sin(ang)*spread*p.s;
+          if(on){const dx=p.x-P.x,dy=p.y-P.y,d=Math.hypot(dx,dy);if(d<R){const f=(1-d/R)*R*.9;tx+=dx/(d||1)*f;ty+=dy/(d||1)*f}}
+          p.x+=(tx-p.x)*.08;p.y+=(ty-p.y)*.08;lx.fillRect(p.x,p.y,1.4,1.4);
+        }
+      }}
+  },
+  /* 06 the sun sets over the piece; the visitor can hold it up */
+  sunset(){
+    let held=false,hy=0,lift=0;
+    return{
+      onDown(x,y){held=true;hy=y},onDrag(x,y){hy=y},onUp(){held=false},
+      draw(t){
+        clear();const hz=H*.66,p=progress(),r=Math.min(W,H)*.09;
+        const sched=H*.22+p*(hz-H*.22+H*.12);
+        const want=held?Math.min(sched,Math.max(H*.12,hy))-sched:0;lift+=(want-lift)*(held?.15:.03);
+        const sy=sched+lift;
+        lx.save();lx.beginPath();lx.rect(0,0,W,hz);lx.clip();
+        lx.globalAlpha=.35+A.level*.6;lx.drawImage(glowSprite,W/2-r*4,sy-r*4,r*8,r*8);lx.globalAlpha=1;
+        lx.fillStyle=`rgba(${LIGHT},.95)`;lx.beginPath();lx.arc(W/2,sy,r,0,Math.PI*2);lx.fill();lx.restore();
+        lx.fillStyle=`rgba(${LIGHT},.25)`;lx.fillRect(0,hz,W,1);
+        const vis=Math.max(0,1-(sy-hz+r)/(r*2.2));
+        for(let i=0;i<26;i++){const y=hz+6+i*i*.55,w=(r*2.4-i*3)*(.6+A.mid*.8)*(.7+.3*Math.sin(t*.003+i));if(w<=0||y>H)continue;
+          lx.fillStyle=`rgba(${LIGHT},${(.5-i*.017)*Math.min(1,vis+.15)})`;lx.fillRect(W/2-w/2+Math.sin(t*.002+i)*6,y,w,1)}
+      }}
+  },
+  /* 07 fog you can part, and sunlight you can let in */
+  fog(){
+    const b=Array.from({length:70},()=>({x:rand(-.2,1.2),y:rand(-.2,1.2),r:rand(.18,.45),vx:rand(-.00012,.00012),vy:rand(-.00006,.00006),px:0,py:0}));
+    const rays=[];const sc=SC(9,'major'); // A major
+    return{
+      onUp(x,y,tap){if(tap){rays.push({x,born:performance.now()});tone(pick(sc,y),x,{vol:.06,dur:3.2,attack:.3,partials:[[1,1],[2,.3]]})}},
+      draw(t){
+        clear();const m=Math.max(W,H),on=dragging;
+        for(const f of b){
+          f.x+=f.vx*(1+A.level*3)+f.px;f.y+=f.vy+f.py;f.px*=.94;f.py*=.94;
+          if(on){const dx=f.x*W-P.x,dy=f.y*H-P.y,d=Math.hypot(dx,dy),R=f.r*m*.6;if(d<R){f.px+=dx/(d||1)*.0025;f.py+=dy/(d||1)*.0025}}
+          if(f.x<-.4)f.x=1.4;if(f.x>1.4)f.x=-.4;if(f.y<-.4)f.y=1.4;if(f.y>1.4)f.y=-.4;
+          lx.globalAlpha=.05+A.level*.16;const s=f.r*m*(1+A.bass*.3);lx.drawImage(fogSprite,f.x*W-s/2,f.y*H-s/2,s,s);
+        }
+        lx.globalAlpha=1;
+        for(let i=rays.length-1;i>=0;i--){const r=rays[i],k=(performance.now()-r.born)/5000;if(k>=1){rays.splice(i,1);continue}
+          const a=Math.sin(Math.PI*k)*.35,w=Math.min(W,H)*.12;
+          const g=lx.createLinearGradient(0,0,0,H);g.addColorStop(0,`rgba(246,224,182,${a})`);g.addColorStop(1,'rgba(246,224,182,0)');
+          lx.fillStyle=g;lx.beginPath();lx.moveTo(r.x-w*.3,0);lx.lineTo(r.x+w*.3,0);lx.lineTo(r.x+w*1.2,H);lx.lineTo(r.x-w*1.2,H);lx.closePath();lx.fill()}
+      }}
+  },
+  /* 08 wind, with chimes the visitor hangs */
+  wind(){
+    let st=[];const rings=[];const sc=SC(5,'minor'); // F minor
+    return{
+      onDown(x,y){tone(pick(sc,y),x,{vol:.16,dur:3.2});rings.push({x,y,r:0})},
+      draw(t){
+        fade(.08);const sp=1.2+A.level*7;
+        if(st.length<160&&Math.random()<.9)st.push({x:-20,y:rand(H),l:rand(20,90),s:rand(.6,1.4)});
+        lx.lineWidth=1;
+        for(const s of st){const ox=s.x;s.x+=sp*s.s;s.y+=Math.sin(t*.001+s.x*.004)*.5;
+          lx.strokeStyle=`rgba(${LIGHT},${.15+A.high*.6})`;lx.beginPath();lx.moveTo(ox-s.l*.2,s.y);lx.lineTo(s.x,s.y);lx.stroke()}
+        st=st.filter(s=>s.x<W+40);
+        for(let i=rings.length-1;i>=0;i--){const r=rings[i];r.r+=2.2;const a=Math.max(0,1-r.r/220);
+          lx.strokeStyle=`rgba(${LIGHT},${a})`;lx.beginPath();lx.arc(r.x,r.y,r.r,0,Math.PI*2);lx.stroke();
+          lx.globalAlpha=a;lx.drawImage(glowSprite,r.x-20,r.y-20,40,40);lx.globalAlpha=1;
+          lx.fillStyle=`rgba(${LIGHT},${a*.6})`;lx.fillRect(r.x-.5,0,1,r.y);
+          if(a<=0)rings.splice(i,1)}
+      }}
+  },
+  /* 09 constellation; the visitor can add stars */
+  constellation(){
+    const pts=[];let cool=0;const sc=SC(10,'major'); // A# major
+    function add(x,y,mine){let best=null,bd=1e9;for(const q of pts){const d=Math.hypot(q.x-x,q.y-y);if(d<bd){bd=d;best=q}}pts.push({x,y,b:1,link:best,mine});if(pts.length>220)pts.shift()}
+    return{
+      onDown(x,y){add(x,y,true);tone(pick(sc,y),x,{vol:.09,dur:2.6})},
+      draw(t){
+        clear();cool--;
+        if((A.onset>.9||Math.random()<A.level*.05)&&cool<=0){add(W*.5+rand(-1,1)*W*.36,H*.46+rand(-1,1)*H*.32,false);cool=6}
+        for(const p of pts){p.b*=.985;if(p.link){lx.strokeStyle=`rgba(${LIGHT},${.12+p.b*.5})`;lx.lineWidth=.8;lx.beginPath();lx.moveTo(p.x,p.y);lx.lineTo(p.link.x,p.link.y);lx.stroke()}}
+        for(const p of pts){const tw=.6+.4*Math.sin(t*.003+p.x),s=(p.mine?12:6)+p.b*26+A.high*10;
+          lx.globalAlpha=Math.min(1,.35+p.b)*tw;lx.drawImage(glowSprite,p.x-s/2,p.y-s/2,s,s);lx.globalAlpha=1;
+          lx.fillStyle=`rgba(${LIGHT},.95)`;const d=p.mine?3:2;lx.fillRect(p.x-d/2,p.y-d/2,d,d)}
+      }}
+  },
+  /* 10 rebirth; the visitor can begin again from anywhere */
+  rebirth(){
+    const rings=[],sparks=[];let last=0;const sc=SC(6,'minor'); // F# minor
+    const burst=(cx,cy,n)=>{rings.push({cx,cy,r:4});for(let i=0;i<n;i++){const a=rand(Math.PI*2),v=rand(1,4);sparks.push({x:cx,y:cy,vx:Math.cos(a)*v,vy:Math.sin(a)*v,l:1})}};
+    return{
+      onDown(x,y){burst(x,y,50);tone(pick(sc,y)-12,x,{vol:.12,dur:3,partials:[[1,1],[2,.35],[3,.12]]})},
+      draw(t){
+        fade(.12);const m=Math.hypot(W,H);
+        if(A.onset>.9&&t-last>350||t-last>4200){last=t;burst(W/2,H/2,40)}
+        for(let i=rings.length-1;i>=0;i--){const r=rings[i];r.r+=2+r.r*.012;const a=.9*(1-r.r/m);
+          lx.strokeStyle=`rgba(${LIGHT},${Math.max(0,a)})`;lx.lineWidth=1;lx.beginPath();lx.arc(r.cx,r.cy,r.r,0,Math.PI*2);lx.stroke();if(r.r>m)rings.splice(i,1)}
+        for(let i=sparks.length-1;i>=0;i--){const s=sparks[i];s.x+=s.vx;s.y+=s.vy;s.l-=.008;lx.fillStyle=`rgba(${LIGHT},${s.l})`;lx.fillRect(s.x,s.y,1.5,1.5);if(s.l<=0)sparks.splice(i,1)}
+        const c=10+A.level*60;lx.globalAlpha=.4+A.level*.6;lx.drawImage(glowSprite,W/2-c,H/2-c,c*2,c*2);lx.globalAlpha=1;
+      }}
+  },
+  /* 11 the song carves itself into a line; the visitor can go back, never forward */
+  carve(){
+    let lastX=-1,flash=null;const geo=()=>({y:H*.5,x0:W*.08,x1:W*.92});
+    return{
+      resize(){lastX=-1},
+      onDown(x,y){const {y:ly,x0,x1}=geo();if(x>=x0&&x<=lastX&&Math.abs(y-ly)<H*.4&&au.duration){au.currentTime=(x-x0)/(x1-x0)*au.duration;flash={x,born:performance.now()}}},
+      draw(t){
+        const {y,x0,x1}=geo(),x=x0+(x1-x0)*progress();
+        if(lastX<0){clear();lx.fillStyle=`rgba(${LIGHT},.18)`;lx.fillRect(x0,y,x1-x0,1);lastX=x0}
+        const h=Math.max(1,A.level*H*.34);
+        if(x>lastX){for(let xi=lastX;xi<=x;xi+=1){lx.fillStyle=`rgba(${LIGHT},${.35+A.level*.6})`;lx.fillRect(xi,y-h,1,h*2)}lastX=x}
+        overlay=()=>{
+          ctx.fillStyle=`rgba(${LIGHT},.9)`;ctx.fillRect(x,y-H*.38,1,H*.76);ctx.drawImage(glowSprite,x-10,y-10,20,20);
+          if(pointerIn()&&P.x>=x0&&P.x<=lastX&&au.duration){const s=(P.x-x0)/(x1-x0)*au.duration;
+            ctx.fillStyle=`rgba(${LIGHT},.35)`;ctx.fillRect(P.x,y-H*.3,1,H*.6);
+            ctx.font='300 12px "Zen Kaku Gothic New", Arial, sans-serif';ctx.textAlign='center';ctx.fillStyle=`rgba(${LIGHT},.8)`;ctx.fillText(fmt(s),P.x,y-H*.32)}
+          if(flash){const k=(performance.now()-flash.born)/900;if(k>=1)flash=null;else{ctx.globalAlpha=1-k;ctx.drawImage(glowSprite,flash.x-40,y-40,80,80);ctx.globalAlpha=1}}
+        };
+      }}
+  },
+  /* 12 for Ryuichi: a square of still water; the visitor can let drops fall */
+  shrine(){
+    let rip=[];const falls=[];const sc=SC(10,'minor'); // A# minor
+    const sq=()=>{const s=Math.min(W,H)*.56;return{s,x0:W/2-s/2,y0:H*.47-s/2}};
+    return{
+      onDown(x,y){const {s,x0,y0}=sq();if(x>=x0&&x<=x0+s&&y>=y0&&y<=y0+s)falls.push({x,y,born:performance.now(),hit:false})},
+      draw(t){
+        clear();const {s,x0,y0}=sq();
+        lx.strokeStyle=`rgba(${LIGHT},.22)`;lx.lineWidth=1;lx.strokeRect(x0,y0,s,s);
+        if(Math.random()<.05+A.level*.35||A.onset>.95)rip.push({x:x0+rand(s),y:y0+rand(s),r:0,max:rand(s*.12,s*.4)});
+        for(let i=falls.length-1;i>=0;i--){const f=falls[i],k=(performance.now()-f.born)/380;
+          if(k<1){lx.fillStyle=`rgba(${LIGHT},.7)`;lx.fillRect(f.x-.5,0,1,f.y*k)}
+          else if(!f.hit){f.hit=true;rip.push({x:f.x,y:f.y,r:0,max:s*.45,a:1.4});tone(pick(sc,f.y),f.x,{vol:.1,dur:3,type:'triangle',partials:[[1,1],[2,.15]]});falls.splice(i,1)}}
+        lx.save();lx.beginPath();lx.rect(x0,y0,s,s);lx.clip();
+        rip=rip.filter(p=>p.r<p.max);
+        for(const p of rip){p.r+=.7;const k=(1-p.r/p.max)*(p.a||1);
+          for(let j=0;j<3;j++){const rr=p.r-j*7;if(rr<=0)continue;lx.strokeStyle=`rgba(${LIGHT},${Math.min(1,k*(.55-j*.15))})`;lx.beginPath();lx.arc(p.x,p.y,rr,0,Math.PI*2);lx.stroke()}}
+        lx.restore();
+        if(A.onset>.9){const dx=x0+rand(s);lx.fillStyle=`rgba(${LIGHT},.4)`;lx.fillRect(dx,0,1,y0)}
+      }}
+  },
+  /* 13 the same sky, live; the visitor can move both skies through the day */
+  sky(){
+    const cities=[{n:'San Diego',tz:'America/Los_Angeles',lat:32.72,lon:-117.16},{n:'Tokyo',tz:'Asia/Tokyo',lat:35.68,lon:139.69}];
+    const stars=Array.from({length:140},()=>({x:Math.random(),y:Math.random()*.8,p:rand(6)}));
+    const R=Math.PI/180;let off=0,offT=0,sx=0,base=0;
+    function elev(lat,lon,d){const n=(d-Date.UTC(d.getUTCFullYear(),0,0))/864e5,dec=-23.44*Math.cos(2*Math.PI/365*(n+10));
+      const st=d.getUTCHours()+d.getUTCMinutes()/60+lon/15,Hh=15*(st-12);
+      return Math.asin(Math.sin(lat*R)*Math.sin(dec*R)+Math.cos(lat*R)*Math.cos(dec*R)*Math.cos(Hh*R))/R}
+    const stops=[[-90,[3,4,10],[8,10,22]],[-12,[6,9,24],[16,22,48]],[-4,[22,30,70],[150,90,90]],[2,[60,90,150],[245,160,100]],[12,[70,130,205],[200,215,230]],[90,[50,110,200],[175,205,235]]];
+    function skyCols(e){for(let i=0;i<stops.length-1;i++){const a=stops[i],b=stops[i+1];if(e<=b[0]){const k=(e-a[0])/(b[0]-a[0]),mix=(p,q)=>p.map((v,j)=>Math.round(v+(q[j]-v)*k));return[mix(a[1],b[1]),mix(a[2],b[2])]}}return[stops[5][1],stops[5][2]]}
+    return{
+      onDown(x){sx=x;base=offT},onDrag(x){offT=Math.max(-12,Math.min(12,base+(x-sx)/W*24))},onUp(){offT=0},
+      draw(t){
+        off+=(offT-off)*(dragging?.2:.03);
+        const now=new Date(Date.now()+off*36e5),half=W>=H*.9;
+        cities.forEach((c,i)=>{
+          const x=half?i*W/2:0,y=half?0:i*H/2,w=half?W/2:W,h=half?H:H/2,e=elev(c.lat,c.lon,now),[top,bot]=skyCols(e);
+          const g=lx.createLinearGradient(0,y,0,y+h);g.addColorStop(0,`rgb(${top})`);g.addColorStop(.78,`rgb(${bot})`);g.addColorStop(.78,'#000');g.addColorStop(1,'#000');
+          lx.fillStyle=g;lx.fillRect(x,y,w,h);
+          const night=Math.max(0,Math.min(1,(-e-2)/8));
+          if(night>0)for(const s of stars){const a=night*(.4+.6*Math.sin(t*.002+s.p))*(.6+A.high*1.4);lx.fillStyle=`rgba(${LIGHT},${Math.max(0,a)})`;lx.fillRect(x+s.x*w,y+s.y*h*.75,1.3,1.3)}
+          if(e>-6){const sy=y+h*.78-(e+6)/60*h*.7,r=Math.min(w,h)*.05;lx.globalAlpha=Math.min(1,(e+6)/8)*(.6+A.level*.4);lx.drawImage(glowSprite,x+w/2-r*3,sy-r*3,r*6,r*6);lx.globalAlpha=1}
+          lx.fillStyle=`rgba(${LIGHT},.3)`;lx.fillRect(x,y+h*.78,w,1);
+          const time=new Intl.DateTimeFormat('en-US',{timeZone:c.tz,hour:'numeric',minute:'2-digit'}).format(now);
+          lx.fillStyle=`rgba(${LIGHT},.92)`;lx.textAlign='center';lx.font=`400 ${Math.max(18,Math.min(w,h)*.05)}px "Shippori Mincho", Georgia, serif`;lx.fillText(c.n,x+w/2,y+Math.max(70,h*.12));
+          lx.font='300 12px "Zen Kaku Gothic New", Arial, sans-serif';lx.fillStyle=`rgba(${LIGHT},.6)`;
+          const shift=Math.abs(off)>.1?`  ·  ${off>0?'+':'−'}${Math.abs(off).toFixed(1)} H FROM NOW`:'  ·  NOW';
+          lx.fillText(time.toUpperCase()+shift,x+w/2,y+Math.max(70,h*.12)+24);
+        });
+        lx.fillStyle='#000';half?lx.fillRect(W/2-.5,0,1,H):lx.fillRect(0,H/2-.5,W,1);
+      }}
+  },
+  /* 14 a door of light, closing; the visitor can hold it open */
+  door(){
+    let hold=0;
+    return{draw(t){
+      hold+=((dragging?1:0)-hold)*(dragging?.02:.05);
+      const p=progress(),sched=Math.max(0,W*.34*(1-p)*(1-p*.2)),gap=Math.max(sched,W*.3*hold),x=W/2,top=H*.12,bot=H*.86,b=.55+A.level*.45;
+      clear();
+      const g=lx.createLinearGradient(x-gap/2-60,0,x+gap/2+60,0);
+      g.addColorStop(0,`rgba(${LIGHT},0)`);g.addColorStop(gap?60/(gap+120):.5,`rgba(${LIGHT},${b})`);g.addColorStop(gap?1-60/(gap+120):.5,`rgba(${LIGHT},${b})`);g.addColorStop(1,`rgba(${LIGHT},0)`);
+      lx.fillStyle=g;lx.fillRect(x-gap/2-60,top,gap+120,bot-top);
+      lx.fillStyle=`rgba(${LIGHT},.9)`;lx.fillRect(x-gap/2-.5,top,gap+1,bot-top);
+      const fl=lx.createLinearGradient(0,bot,0,H);fl.addColorStop(0,`rgba(${LIGHT},${.25*b})`);fl.addColorStop(1,`rgba(${LIGHT},0)`);
+      lx.fillStyle=fl;lx.beginPath();lx.moveTo(x-gap/2,bot);lx.lineTo(x+gap/2,bot);lx.lineTo(x+gap*1.5+40,H);lx.lineTo(x-gap*1.5-40,H);lx.closePath();lx.fill();
+    }}
+  }
+};
+
+/* ---------- pointer → the current room ---------- */
+let dragging=false,downAt=null;
+cv.addEventListener('pointerdown',e=>{
+  if(state!=='playing'||!cur)return;dragging=true;downAt={x:e.clientX,y:e.clientY};
+  try{cv.setPointerCapture(e.pointerId)}catch(_){}
+  cur.onDown&&cur.onDown(e.clientX,e.clientY);
+});
+cv.addEventListener('pointermove',e=>{if(state==='playing'&&cur&&dragging&&cur.onDrag)cur.onDrag(e.clientX,e.clientY)});
+const pUp=e=>{if(!dragging)return;dragging=false;const tap=downAt?Math.hypot(e.clientX-downAt.x,e.clientY-downAt.y)<10:false;cur&&cur.onUp&&cur.onUp(e.clientX,e.clientY,tap)};
+cv.addEventListener('pointerup',pUp);cv.addEventListener('pointercancel',pUp);
+
+/* ---------- exhibition flow ---------- */
+let state='entrance',idx=0,cur=null,overlay=null,visitStart=0,visit=0;
+const spent=ROOMS.map(()=>0);let lastT=0;
+
+function enterRoom(i){
+  idx=i;const r=ROOMS[i];
+  if(cur&&cur.dispose)cur.dispose();overlay=null;
+  clear();cur=INST[r.installation]();
+  $('lNum').textContent=`Room ${pad(i+1)} / ${ROOMS.length}`;
+  $('lTitle').textContent=r.title;
+  $('lMeta').textContent=[EX.artist,r.release,r.date,fmt(r.duration)].filter(Boolean).join(' · ');
+  $('lSt').textContent=r.statement;$('lTemp').hidden=!r.statementIsTemp;
+  $('lAttr').hidden=!r.attribution;$('lAttr').textContent=r.attribution?'\u2014 '+r.attribution:'';
+  $('label').classList.toggle('onlight',r.installation==='sky');
+  const hint=$('lHint');hint.hidden=!HINTS[r.installation];hint.textContent=HINTS[r.installation]||'';
+  $('door').classList.remove('show');$('room').classList.remove('dark');
+  au.src=r.file;au.currentTime=0;lastT=0;
+  master&&master.gain.setValueAtTime(1,actx.currentTime);
+  state='playing';P.lastMove=performance.now();P.still=0;
+  au.play().catch(()=>{$('pauseBtn').textContent='Play'});$('pauseBtn').textContent='Pause';
+  showUI();
+}
+function leaveRoom(){
+  if(state!=='playing')return;
+  state='threshold';
+  $('room').classList.add('dark');
+  $('label').classList.add('hide');$('controls').classList.add('hide');$('time').classList.add('hide');
+  if(actx&&!au.paused){master.gain.setTargetAtTime(0,actx.currentTime,.3)}
+  const v=visit;
+  setTimeout(()=>{if(v!==visit)return;au.pause();
+    if(idx>=ROOMS.length-1){setTimeout(()=>{if(v===visit)toExit()},1500);return}
+    const n=ROOMS[idx+1];$('dNum').textContent=`Room ${pad(idx+2)} / ${ROOMS.length}`;$('dTitle').textContent=n.title;
+    setTimeout(()=>{if(v===visit&&state==='threshold'){$('door').classList.add('show');$('dBtn').focus({preventScroll:true})}},1500);
+  },1500);
+}
+au.addEventListener('timeupdate',()=>{
+  if(state!=='playing')return;
+  const d=au.currentTime-lastT; if(d>0&&d<2)spent[idx]+=d; lastT=au.currentTime;
+  $('prog').style.width=(progress()*100)+'%';
+  $('time').textContent=fmt(au.currentTime)+' / '+fmt(au.duration||ROOMS[idx].duration);
+});
+au.addEventListener('ended',leaveRoom);
+
+/* ---------- entrance clock: shows the visitor's own time; pressing it sends the hands forward ---------- */
+(()=>{const g=$('ticks');let h='';for(let i=0;i<60;i++){const a=i*6*Math.PI/180,big=i%5===0,r1=big?90:96,r2=100;
+  h+=`<line x1="${(Math.sin(a)*r1).toFixed(2)}" y1="${(-Math.cos(a)*r1).toFixed(2)}" x2="${(Math.sin(a)*r2).toFixed(2)}" y2="${(-Math.cos(a)*r2).toFixed(2)}" stroke="${big?'#ece8e1':'#3a3936'}" stroke-width="${big?1.4:.8}"/>`}g.innerHTML=h})();
+let sweep=null;
+const ease=k=>k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2;
+function clockTick(){
+  if(state!=='entrance')return;
+  requestAnimationFrame(clockTick);
+  const d=new Date(),ms=d.getMilliseconds(),sec=d.getSeconds()+ms/1000,min=d.getMinutes()+sec/60,hr=(d.getHours()%12)+min/60;
+  let a=[hr*30,min*6,Math.floor(sec)*6+ (reduced?0:Math.max(0,(ms-850)/150)*6)];
+  if(sweep){const k=Math.min(1,(performance.now()-sweep)/2600),e=ease(k);a=[a[0]+e*120,a[1]+e*1440,a[2]+e*4320]}
+  [['hH',a[0]],['hM',a[1]],['hS',a[2]]].forEach(([id,deg])=>$(id).setAttribute('transform',`rotate(${deg.toFixed(2)})`));
+}
+requestAnimationFrame(clockTick);
+$('clockBtn').addEventListener('click',()=>{
+  if(sweep)return;
+  initAudio();actx.resume();
+  au.src=ROOMS[0].file;au.play().then(()=>au.pause()).catch(()=>{}); // unlock playback inside the click
+  sweep=performance.now();$('press').textContent='';
+  setTimeout(()=>$('entry').classList.add('gone'),reduced?200:2300);
+  const v=++visit;
+  setTimeout(()=>{if(v!==visit)return;
+    $('entrance').hidden=true;$('room').hidden=false;$('exit').hidden=true;
+    visitStart=Date.now();spent.fill(0);
+    resize();enterRoom(0);
+  },reduced?900:3600);
+});
+$('dBtn').addEventListener('click',()=>{actx&&actx.resume();enterRoom(idx+1)});
+$('skipBtn').addEventListener('click',leaveRoom);
+function toEntrance(){
+  visit++;state='entrance';au.pause();if(cur&&cur.dispose)cur.dispose();cur=null;overlay=null;clearTimeout(uiTimer);dragging=false;
+  $('door').classList.remove('show');$('room').hidden=true;$('exit').hidden=true;$('entrance').hidden=false;$('entrance').scrollTop=0;
+  sweep=null;$('entry').classList.remove('gone');$('press').textContent='Press the clock to enter';requestAnimationFrame(clockTick);
+}
+$('homeBtn').addEventListener('click',toEntrance);$('dHome').addEventListener('click',toEntrance);
+$('pauseBtn').addEventListener('click',()=>{
+  if(au.paused){actx&&actx.resume();au.play();$('pauseBtn').textContent='Pause';showUI()}
+  else{au.pause();$('pauseBtn').textContent='Play';showUI();clearTimeout(uiTimer)}
+});
+addEventListener('keydown',e=>{
+  if(state==='playing'){
+    if(e.code==='Space'){e.preventDefault();$('pauseBtn').click()}
+    if(e.code==='ArrowRight')leaveRoom();
+  }
+});
+addEventListener('resize',()=>{if(state!=='entrance')resize()});
+
+/* ---------- render loop ---------- */
+function frame(t){
+  requestAnimationFrame(frame);
+  if(state==='entrance'||state==='exit'||!cur)return;
+  readAudio();
+  if(!au.paused||state==='threshold')cur.draw(t);
+  ctx.clearRect(0,0,W,H);ctx.drawImage(layer,0,0,W,H);
+  if(overlay)overlay();
+}
+requestAnimationFrame(frame);
+
+/* ---------- exit + ticket stub ---------- */
+const links=$('links');
+[['Spotify',EX.links.spotify],['Instagram',EX.links.instagram]].forEach(([n,u])=>{const a=document.createElement('a');a.href=u;a.target='_blank';a.rel='noopener';a.textContent=n;links.appendChild(a)});
+function toExit(){
+  state='exit';if(cur&&cur.dispose)cur.dispose();cur=null;
+  $('room').hidden=true;$('exit').hidden=false;$('exit').scrollTop=0;
+  const ol=$('creditList');ol.innerHTML='';
+  ROOMS.forEach((r,i)=>{const li=document.createElement('li');li.innerHTML=`<span>${pad(i+1)}&nbsp;&nbsp;</span>`;li.firstChild.append(r.title);const s=document.createElement('span');s.textContent=spent[i]>1?`heard ${fmt(spent[i])}`:'passed through';li.append(s);ol.append(li)});
+  document.fonts.ready.then(drawTicket);
+}
+let ticketURL='';
+function drawTicket(){
+  const w=1600,h=640,c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');
+  const css=getComputedStyle(document.documentElement),paper=css.getPropertyValue('--ticket').trim(),ink=css.getPropertyValue('--ink').trim();
+  const D=new Date(visitStart||Date.now()), total=spent.reduce((a,b)=>a+b,0), serial=String(D.getTime()).slice(-7);
+  // stock
+  g.fillStyle=paper;g.fillRect(0,0,w,h);
+  for(let i=0;i<9000;i++){g.fillStyle=`rgba(20,19,18,${Math.random()*.035})`;g.fillRect(Math.random()*w,Math.random()*h,2,2)}
+  const stubX=1240;
+  // perforation
+  g.fillStyle='#050505';for(let y=14;y<h;y+=26){g.beginPath();g.arc(stubX,y,5,0,Math.PI*2);g.fill()}
+  g.beginPath();g.arc(stubX,0,22,0,Math.PI*2);g.arc(stubX,h,22,0,Math.PI*2);g.fill();
+  g.fillStyle=ink;g.textBaseline='alphabetic';
+  // header
+  g.font='500 18px "Zen Kaku Gothic New", Arial, sans-serif';g.letterSpacing='6px';g.fillText('AN EXHIBITION IN FOURTEEN ROOMS',64,78);
+  g.letterSpacing='0px';g.font='400 96px "Shippori Mincho", Georgia, serif';g.fillText(EX.title,60,182);
+  g.font='300 26px "Zen Kaku Gothic New", Arial, sans-serif';g.fillText(EX.artist,64,226);
+  // waveform: every room, width by its length; heard time drawn solid, the rest left as a hairline
+  const wx=64,ww=stubX-128,wy=372,wh=92;let x=wx;
+  g.fillStyle='rgba(20,19,18,.18)';g.fillRect(wx,wy,ww,1);
+  ROOMS.forEach((r,i)=>{
+    const pk=(r.peaks&&r.peaks.length)?r.peaks:Array(60).fill(.3), rw=ww*r.duration/totalDur, heard=Math.min(1,spent[i]/r.duration), n=pk.length;
+    for(let k=0;k<n;k++){const px=x+rw*k/n,bw=Math.max(1,rw/n-1.2),v=pk[k];
+      const on=k/n<heard; g.fillStyle=on?ink:'rgba(20,19,18,.16)'; const hh=Math.max(1,v*wh*(on?1:.35)); g.fillRect(px,wy-hh,bw,hh*2)}
+    g.fillStyle='rgba(20,19,18,.5)';g.font='400 13px "Zen Kaku Gothic New", Arial, sans-serif';g.fillText(pad(i+1),x+2,wy+wh+30);
+    g.fillStyle='rgba(20,19,18,.25)';g.fillRect(x,wy+wh+8,1,10);
+    x+=rw;
+  });
+  // details row
+  const dateStr=D.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}), timeStr=D.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  const cols=[['DATE',dateStr],['ENTERED',timeStr],['TIME INSIDE',fmt(total)],['ROOMS HEARD',`${spent.filter(s=>s>1).length} of ${ROOMS.length}`]];
+  cols.forEach(([k,v],i)=>{const cx=64+i*290;g.fillStyle='rgba(20,19,18,.55)';g.font='500 14px "Zen Kaku Gothic New", Arial, sans-serif';g.letterSpacing='4px';g.fillText(k,cx,560);g.letterSpacing='0px';g.fillStyle=ink;g.font='400 28px "Shippori Mincho", Georgia, serif';g.fillText(v,cx,598)});
+  // stub
+  g.save();g.translate(stubX+180,h/2);g.rotate(-Math.PI/2);g.textAlign='center';
+  g.font='500 16px "Zen Kaku Gothic New", Arial, sans-serif';g.letterSpacing='8px';g.fillStyle='rgba(20,19,18,.6)';g.fillText('ADMIT ONE',0,-70);
+  g.letterSpacing='0px';g.font='400 46px "Shippori Mincho", Georgia, serif';g.fillStyle=ink;g.fillText('as time passes',0,-12);
+  g.font='300 20px "Zen Kaku Gothic New", Arial, sans-serif';g.fillText(`No. ${serial}`,0,30);
+  g.font='300 16px "Zen Kaku Gothic New", Arial, sans-serif';g.fillStyle='rgba(20,19,18,.6)';g.fillText(`${pad(D.getMonth()+1)}.${pad(D.getDate())}.${D.getFullYear()}`,0,62);
+  g.restore();
+  ticketURL=c.toDataURL('image/png');$('ticketImg').src=ticketURL;
+}
+$('dlBtn').addEventListener('click',()=>{
+  if(!ticketURL)return;const a=document.createElement('a');a.href=ticketURL;a.download='as-time-passes-ticket.png';document.body.appendChild(a);a.click();a.remove();
+});
+$('againBtn').addEventListener('click',toEntrance);
+})();
+</script>
