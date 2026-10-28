@@ -31,9 +31,9 @@ a{color:inherit}
 
 /* ---------- entrance ---------- */
 #entrance{display:flex;align-items:center;overflow-y:auto}
-.entry{width:min(100%,560px);margin-inline:auto;display:grid;gap:22px;padding-block:40px;justify-items:center;text-align:center;transition:opacity 1.2s ease,filter 1.2s ease,transform 1.4s ease}
+.entry{width:min(100%,clamp(560px,62vw,760px));margin-inline:auto;display:grid;gap:22px;padding-block:40px;justify-items:center;text-align:center;transition:opacity 1.2s ease,filter 1.2s ease,transform 1.4s ease}
 .entry.gone{opacity:0;filter:blur(8px);transform:scale(1.04)}
-.clock{width:min(64vw,300px);max-width:100%;aspect-ratio:1;border-radius:50%;padding:0;transition:transform .8s ease}
+.clock{width:min(64vw,clamp(260px,36vh,440px));max-width:100%;aspect-ratio:1;border-radius:50%;padding:0;transition:transform .8s ease}
 .clock:hover{transform:scale(1.02)}
 .clock:focus-visible{outline-offset:10px}
 .clock svg{width:100%;height:100%;display:block;overflow:visible}
@@ -41,9 +41,9 @@ a{color:inherit}
 .entry .rules{text-align:left;width:100%;margin-top:10px}
 .eyebrow{font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--dim)}
 h1{font-family:var(--display);font-weight:400;font-size:clamp(44px,9vw,92px);line-height:1;letter-spacing:-.01em;margin:0;text-wrap:balance}
-.byline{font-size:15px;color:var(--dim);letter-spacing:.04em}
-.note{font-size:15px;line-height:1.8;max-width:60ch;color:var(--light);margin:0}
-.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px 24px;border-top:1px solid var(--faint);padding-top:20px;font-size:13px;color:var(--dim);line-height:1.6}
+.byline{font-size:clamp(15px,.9vw + 8px,19px);color:var(--dim);letter-spacing:.04em}
+.note{font-size:clamp(15px,1vw + 8px,20px);line-height:1.8;max-width:60ch;color:var(--light);margin:0}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px 24px;border-top:1px solid var(--faint);padding-top:20px;font-size:clamp(13px,.7vw + 7px,16px);color:var(--dim);line-height:1.6}
 .rules b{display:block;font-weight:500;color:var(--light);font-size:12px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:4px}
 .enter{justify-self:start;display:inline-flex;align-items:center;gap:14px;border:1px solid var(--light);padding:14px 28px;font-size:13px;letter-spacing:.3em;text-transform:uppercase;transition:background .4s,color .4s}
 .enter:hover{background:var(--light);color:var(--void)}
@@ -56,19 +56,23 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(44px,9vw,92px);lin
 #cv{position:absolute;inset:0;width:100%;height:100%;display:block;transition:opacity 1.6s ease;touch-action:none;cursor:crosshair}
 #room.dark #cv{opacity:0}
 .label{position:absolute;left:max(20px,env(safe-area-inset-left,0px));bottom:calc(28px + env(safe-area-inset-bottom,0px));
-  width:min(340px,calc(100% - 40px));display:grid;gap:6px;transition:opacity 1.2s ease;pointer-events:none}
+  width:min(clamp(340px,36vw,480px),calc(100% - 40px));display:grid;gap:6px;text-shadow:0 1px 14px rgba(0,0,0,.9);transition:opacity 1.2s ease;pointer-events:none}
 .label.hide{opacity:0}
 .label.onlight{background:rgba(5,5,5,.62);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);padding:14px 16px;margin-left:-16px;margin-bottom:-14px}
-.label .num{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--dim);font-variant-numeric:tabular-nums}
-.label .t{font-family:var(--display);font-size:24px;line-height:1.2;margin:2px 0 0}
-.label .meta{font-size:12px;color:var(--dim);line-height:1.6}
-.label .st{font-size:13px;line-height:1.65;margin:6px 0 0;color:var(--light)}
+.label .num{font-size:clamp(11px,.5vw + 7px,13px);letter-spacing:.28em;text-transform:uppercase;color:var(--dim);font-variant-numeric:tabular-nums}
+.label .t{font-family:var(--display);font-size:clamp(24px,1.8vw + 12px,38px);line-height:1.2;margin:2px 0 0}
+.label .meta{font-size:clamp(12px,.5vw + 8px,15px);color:var(--dim);line-height:1.6}
+.label .st{font-size:clamp(13px,.8vw + 7px,18px);line-height:1.65;margin:6px 0 0;color:var(--light)}
 .label .attr{font-size:12px;color:var(--dim);margin:-2px 0 0}
 .label .temp{display:inline-block;font-size:10px;letter-spacing:.2em;text-transform:uppercase;border:1px solid var(--faint);color:var(--dim);padding:1px 6px;margin-top:4px;justify-self:start}
-.label .hint{font-size:12px;color:var(--light);margin-top:4px;opacity:.85}
+.label .hint{font-size:clamp(12px,.5vw + 8px,15px);color:var(--light);margin-top:4px;opacity:.85}
 .controls{position:absolute;top:calc(16px + env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px));display:flex;gap:6px;transition:opacity 1.2s ease}
 .controls.hide{opacity:0}
-.controls button{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--dim);padding:10px 12px}
+.controls button{font-size:clamp(11px,.4vw + 8px,13px);letter-spacing:.24em;text-transform:uppercase;color:var(--dim);padding:10px 12px;text-shadow:0 1px 10px rgba(0,0,0,.9)}
+.scrim{position:absolute;inset:auto 0 0 0;height:48%;background:linear-gradient(to top,rgba(0,0,0,.72),rgba(0,0,0,0));pointer-events:none;transition:opacity 1.2s ease}
+.scrim.hide{opacity:0}
+.controls.onlight{background:rgba(5,5,5,.6);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.controls.onlight button{color:var(--light)}
 .controls button:hover{color:var(--light)}
 .floor{position:absolute;left:0;right:0;bottom:env(safe-area-inset-bottom,0px);height:1px;background:var(--faint)}
 .floor i{position:absolute;inset:0 auto 0 0;width:0;background:var(--dim)}
@@ -89,7 +93,7 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(44px,9vw,92px);lin
 .exitwrap{width:min(100%,980px);margin-inline:auto;padding-block:56px 72px;display:grid;gap:40px}
 .exitwrap h2{font-family:var(--display);font-weight:400;font-size:clamp(36px,6vw,60px);margin:0;line-height:1.05}
 .exitgrid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:40px;align-items:start}
-@media (max-width:760px){.exitgrid{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:980px){.exitgrid{grid-template-columns:minmax(0,1fr)}}
 .ticketbox{display:grid;gap:14px}
 #ticketImg{width:100%;height:auto;display:block;box-shadow:0 30px 60px -30px rgba(0,0,0,.9)}
 .tbtns{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
@@ -105,6 +109,10 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(44px,9vw,92px);lin
 .links a:hover{border-color:var(--light)}
 
 @media (max-width:520px){.label .t{font-size:20px}.label .st{font-size:12.5px}.controls button{padding:10px 8px}}
+/* touch screens: real tap targets, and no hover states that stick after a tap */
+@media (pointer:coarse){.controls button{min-height:44px;padding:12px 14px}.door .back{min-height:44px;padding:12px 16px}.enter{min-height:48px}}
+@media (pointer:coarse) and (max-width:520px){.controls button{padding:12px 8px}}
+@media (hover:none){.clock:hover{transform:none}.enter:hover{background:none;color:inherit}}
 @media (prefers-reduced-motion:reduce){.entry .fade{animation:none}#cv,.label,.door{transition-duration:.3s}}
 </style>
 
@@ -137,6 +145,7 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(44px,9vw,92px);lin
 
 <section id="room" class="view" aria-label="Exhibition room" hidden>
   <canvas id="cv"></canvas>
+  <div class="scrim" id="scrim"></div>
   <div class="label" id="label" aria-live="polite">
     <div class="num" id="lNum"></div>
     <h2 class="t" id="lTitle"></h2>
@@ -239,7 +248,7 @@ const cv=$('cv'),ctx=cv.getContext('2d');
 const layer=document.createElement('canvas'),lx=layer.getContext('2d');
 let W=0,H=0,DPR=1;
 function resize(){
-  DPR=Math.min(2,window.devicePixelRatio||1);
+  DPR=Math.min(2,window.devicePixelRatio||1,Math.sqrt(3.2e6/Math.max(1,innerWidth*innerHeight)));
   W=cv.clientWidth;H=cv.clientHeight;
   for(const c of [cv,layer]){c.width=Math.round(W*DPR);c.height=Math.round(H*DPR)}
   ctx.setTransform(DPR,0,0,DPR,0,0);lx.setTransform(DPR,0,0,DPR,0,0);
@@ -259,12 +268,12 @@ addEventListener('keydown',e=>{P.lastMove=performance.now();showUI()});
 let uiTimer;
 function showUI(){
   if(state!=='playing')return;
-  $('label').classList.remove('hide');$('controls').classList.remove('hide');$('time').classList.remove('hide');
+  ['label','controls','time','scrim'].forEach(id=>$(id).classList.remove('hide'));
   clearTimeout(uiTimer);uiTimer=setTimeout(hideUI,6000);
 }
 function hideUI(){
   if(state!=='playing'||au.paused)return;
-  $('label').classList.add('hide');$('controls').classList.add('hide');$('time').classList.add('hide');
+  ['label','controls','time','scrim'].forEach(id=>$(id).classList.add('hide'));
 }
 
 /* ---------- small helpers for renderers ---------- */
@@ -554,7 +563,7 @@ const INST={
       onDown(x){sx=x;base=offT},onDrag(x){offT=Math.max(-12,Math.min(12,base+(x-sx)/W*24))},onUp(){offT=0},
       draw(t){
         off+=(offT-off)*(dragging?.2:.03);
-        const now=new Date(Date.now()+off*36e5),half=W>=H*.9;
+        const now=new Date(Date.now()+off*36e5),half=true;
         cities.forEach((c,i)=>{
           const x=half?i*W/2:0,y=half?0:i*H/2,w=half?W/2:W,h=half?H:H/2,e=elev(c.lat,c.lon,now),[top,bot]=skyCols(e);
           const g=lx.createLinearGradient(0,y,0,y+h);g.addColorStop(0,`rgb(${top})`);g.addColorStop(.78,`rgb(${bot})`);g.addColorStop(.78,'#000');g.addColorStop(1,'#000');
@@ -564,7 +573,7 @@ const INST={
           if(e>-6){const sy=y+h*.78-(e+6)/60*h*.7,r=Math.min(w,h)*.05;lx.globalAlpha=Math.min(1,(e+6)/8)*(.6+A.level*.4);lx.drawImage(glowSprite,x+w/2-r*3,sy-r*3,r*6,r*6);lx.globalAlpha=1}
           lx.fillStyle=`rgba(${LIGHT},.3)`;lx.fillRect(x,y+h*.78,w,1);
           const time=new Intl.DateTimeFormat('en-US',{timeZone:c.tz,hour:'numeric',minute:'2-digit'}).format(now);
-          lx.fillStyle=`rgba(${LIGHT},.92)`;lx.textAlign='center';lx.font=`400 ${Math.max(18,Math.min(w,h)*.05)}px "Shippori Mincho", Georgia, serif`;lx.fillText(c.n,x+w/2,y+Math.max(70,h*.12));
+          lx.fillStyle=`rgba(${LIGHT},.92)`;lx.textAlign='center';lx.font=`400 ${Math.round(Math.max(18,Math.min(w*.09,h*.05,44)))}px "Shippori Mincho", Georgia, serif`;lx.fillText(c.n,x+w/2,y+Math.max(70,h*.12));
           lx.font='300 12px "Zen Kaku Gothic New", Arial, sans-serif';lx.fillStyle=`rgba(${LIGHT},.6)`;
           const shift=Math.abs(off)>.1?`  ·  ${off>0?'+':'−'}${Math.abs(off).toFixed(1)} H FROM NOW`:'  ·  NOW';
           lx.fillText(time.toUpperCase()+shift,x+w/2,y+Math.max(70,h*.12)+24);
@@ -613,7 +622,7 @@ function enterRoom(i){
   $('lMeta').textContent=[EX.artist,r.release,r.date,fmt(r.duration)].filter(Boolean).join(' · ');
   $('lSt').textContent=r.statement;$('lTemp').hidden=!r.statementIsTemp;
   $('lAttr').hidden=!r.attribution;$('lAttr').textContent=r.attribution?'\u2014 '+r.attribution:'';
-  $('label').classList.toggle('onlight',r.installation==='sky');
+  $('label').classList.toggle('onlight',r.installation==='sky');$('controls').classList.toggle('onlight',r.installation==='sky');
   const hint=$('lHint');hint.hidden=!HINTS[r.installation];hint.textContent=HINTS[r.installation]||'';
   $('door').classList.remove('show');$('room').classList.remove('dark');
   au.src=r.file;au.currentTime=0;lastT=0;
@@ -626,7 +635,7 @@ function leaveRoom(){
   if(state!=='playing')return;
   state='threshold';
   $('room').classList.add('dark');
-  $('label').classList.add('hide');$('controls').classList.add('hide');$('time').classList.add('hide');
+  ['label','controls','time','scrim'].forEach(id=>$(id).classList.add('hide'));
   if(actx&&!au.paused){master.gain.setTargetAtTime(0,actx.currentTime,.3)}
   const v=visit;
   setTimeout(()=>{if(v!==visit)return;au.pause();
