@@ -13,12 +13,11 @@ An exhibition of fourteen pieces by Alijah Jacob, heard one dark room at a time.
 All wall text lives in `rooms.js`.
 
 - `note` at the top is the curatorial note on the entrance.
-- Each room has `title`, `release`, `year` and `statement`.
-- When a room's real wall text is in, set `statementIsTemp` to `false` and the "Placeholder wall text" tag disappears.
+- Each room has `title`, `release`, `date`, `statement`, and an optional `attribution` for pulled quotes.
 
 ## Add or reorder rooms
 
 Rooms play in the order they appear in `rooms.js`. To add one, drop the MP3 in `audio/` and add an entry with its `file`, `duration` (seconds) and one of the installations:
-`rain`, `column`, `hooked`, `static`, `words`, `sunset`, `fog`, `wind`, `constellation`, `rebirth`, `carve`, `shrine`, `sky`, `door`.
+`blinds`, `column`, `hooked`, `static`, `words`, `sunset`, `fog`, `wind`, `constellation`, `rebirth`, `carve`, `shrine`, `sky`, `door`.
 
 `peaks` is the track's loudness shape, used to draw the exit ticket. A new room without it still works; give it a list of 120 numbers between 0 and 1 for a proper waveform.

@@ -38,6 +38,8 @@ a{color:inherit}
 .clock:focus-visible{outline-offset:10px}
 .clock svg{width:100%;height:100%;display:block;overflow:visible}
 .press{font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--dim);margin-top:-6px}
+.ticketlink{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--light);border-bottom:1px solid var(--faint);padding:10px 2px 4px;margin-top:-10px}
+.ticketlink:hover{border-color:var(--light)}
 .entry .rules{text-align:left;width:100%;margin-top:10px}
 .eyebrow{font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--dim)}
 h1{font-family:var(--display);font-weight:400;font-size:clamp(44px,9vw,92px);line-height:1;letter-spacing:-.01em;margin:0;text-wrap:balance}
@@ -67,7 +69,9 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(44px,9vw,92px);lin
 .label .temp{display:inline-block;font-size:10px;letter-spacing:.2em;text-transform:uppercase;border:1px solid var(--faint);color:var(--dim);padding:1px 6px;margin-top:4px;justify-self:start}
 .label .hint{font-size:clamp(12px,.5vw + 8px,15px);color:var(--light);margin-top:4px;opacity:.85}
 .controls{position:absolute;top:calc(16px + env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px));display:flex;gap:6px;transition:opacity 1.2s ease}
-.controls.hide{opacity:0}
+.controls.hide{opacity:0;pointer-events:none}
+.controls button[disabled]{opacity:.3;cursor:default}
+.controls button.confirm{color:var(--light)}
 .controls button{font-size:clamp(11px,.4vw + 8px,13px);letter-spacing:.24em;text-transform:uppercase;color:var(--dim);padding:10px 12px;text-shadow:0 1px 10px rgba(0,0,0,.9)}
 .scrim{position:absolute;inset:auto 0 0 0;height:48%;background:linear-gradient(to top,rgba(0,0,0,.72),rgba(0,0,0,0));pointer-events:none;transition:opacity 1.2s ease}
 .scrim.hide{opacity:0}
@@ -87,6 +91,7 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(44px,9vw,92px);lin
 .door .enter{justify-self:center}
 .door .back{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--dim);padding:8px}
 .door .back:hover{color:var(--light)}
+.doorrow{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 16px}
 
 /* ---------- exit ---------- */
 #exit{overflow-y:auto}
@@ -131,6 +136,7 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(44px,9vw,92px);lin
       </svg>
     </button>
     <div class="press fade" id="press">Press the clock to enter</div>
+    <button class="ticketlink" id="ticketBtn" hidden>See your ticket so far</button>
     <div class="eyebrow fade">An exhibition in fourteen rooms</div>
     <h1 class="fade" id="exTitle">as time passes</h1>
     <div class="byline fade" id="exBy">Alijah Jacob · 14 pieces · 17 minutes</div>
@@ -156,9 +162,10 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(44px,9vw,92px);lin
     <div class="hint" id="lHint" hidden></div>
   </div>
   <div class="controls" id="controls">
-    <button id="homeBtn">← Entrance</button>
+    <button id="homeBtn">Entrance</button>
+    <button id="prevBtn">← Prev</button>
     <button id="pauseBtn" aria-label="Pause">Pause</button>
-    <button id="skipBtn">Next room →</button>
+    <button id="skipBtn">Next →</button>
   </div>
   <div class="time" id="time"></div>
   <div class="floor"><i id="prog"></i></div>
@@ -166,7 +173,7 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(44px,9vw,92px);lin
     <div class="num" id="dNum"></div>
     <h2 class="t" id="dTitle"></h2>
     <button class="enter" id="dBtn">Enter next room</button>
-    <button class="back" id="dHome">Back to entrance</button>
+    <div class="doorrow"><button class="back" id="dAgain">Hear this room again</button><button class="back" id="dHome">Back to entrance</button></div>
   </div>
 </section>
 
@@ -265,9 +272,12 @@ addEventListener('pointermove',onMove,{passive:true});
 document.documentElement.addEventListener('mouseleave',()=>{P.inside=false});
 addEventListener('pointerdown',onMove,{passive:true});
 addEventListener('keydown',e=>{P.lastMove=performance.now();showUI()});
-let uiTimer;
+let uiTimer,uiShownAt=0;
+// taps that land on the controls just as they fade back in are ignored, so fidgeting can't press them by accident
+document.getElementById('controls').addEventListener('click',e=>{if(performance.now()-uiShownAt<700){e.stopPropagation();e.preventDefault()}},true);
 function showUI(){
   if(state!=='playing')return;
+  if($('controls').classList.contains('hide'))uiShownAt=performance.now();
   ['label','controls','time','scrim'].forEach(id=>$(id).classList.remove('hide'));
   clearTimeout(uiTimer);
 }
@@ -300,13 +310,13 @@ function tone(midi,x,o={}){
 const pointerIn=()=>dragging||(P.type==='mouse'&&P.inside);
 
 const HINTS={
-  rain:'Tap to let a drop fall. Drag to make it rain.',
+  blinds:'Drag to stir the dust. Tap to tilt the blinds.',
   column:'Drag to move the light. Tap it to tear it down.',
   hooked:'Press and pull the line. Let go.',
   static:'Touch the static to calm it.',
   words:'Run through the words. Tap to let them go.',
   sunset:'Drag the sun to hold it up a little longer.',
-  fog:'Drag to part the fog. Tap to let the sunlight in.',
+  fog:'Wipe the fog off the glass. Every spot holds a different shade of light.',
   wind:'Tap anywhere to hang a chime. Higher on the screen, higher the note.',
   constellation:'Tap to place a star of your own.',
   rebirth:'Tap to begin again, anywhere.',
@@ -317,21 +327,47 @@ const HINTS={
 };
 
 const INST={
-  /* 01 rain on dark water */
-  rain(){
-    let rip=[],lastDrag=0;const sc=SC(2,'minor'); // D minor
-    const drop=(x,y,big)=>{const hz=H*.36;rip.push({x,y:Math.max(y,hz+12),r:0,max:big?rand(130,210):rand(40,90),a:1})};
+  /* 01 bedroom boredom: afternoon light through the blinds, dust drifting in it */
+  blinds(){
+    const sc=SC(2,'minor'); // D minor
+    let open=.5,openT=.5,flick=0,motes=[];
+    const N=260;
+    function seed(){motes=Array.from({length:N},()=>({x:rand(W),y:rand(H),vx:0,vy:0,s:rand(.6,1.8),p:rand(6.28)}))}
+    seed();
+    const opens=[.22,.5,.82];let oi=1;
+    // the window's light lands on the wall as skewed bars; they drift across as the piece goes on
+    const geo=()=>{const p=progress(),slats=9,bandH=Math.min(H*.62,W*1.1)/slats,x0=W*(.12+p*.22),y0=H*.16,skew=W*.22,w=Math.min(W*.5,H*.42);return{slats,bandH,x0,y0,skew,w}};
+    function lit(x,y){const g=geo();const t=(y-g.y0)/(g.bandH*g.slats);if(t<0||t>1)return 0;const xs=g.x0+t*g.skew;if(x<xs||x>xs+g.w)return 0;
+      const f=((y-g.y0)/g.bandH)%1;return f<open?1:0}
     return{
-      onDown(x,y){drop(x,y,true);tone(pick(sc,y),x,{vol:.09,dur:1.8,partials:[[1,1],[3.01,.06]]})},
-      onDrag(x,y){const n=performance.now();if(n-lastDrag>70){lastDrag=n;drop(x+rand(-30,30),y+rand(-20,20),false)}},
+      resize:seed,
+      onDrag(x,y){for(const m of motes){const dx=m.x-x,dy=m.y-y,d=Math.hypot(dx,dy),R=Math.min(W,H)*.16;if(d<R){const k=(1-d/R)*.9;m.vx+=(-dy/(d||1))*k*2.2+dx/(d||1)*k*.6;m.vy+=(dx/(d||1))*k*2.2+dy/(d||1)*k*.6}}},
+      onUp(x,y,tap){if(!tap)return;oi=(oi+1)%opens.length;openT=opens[oi];flick=1;
+        tone(sc[4+oi*2],x,{vol:.08,dur:2.2,partials:[[1,1],[2,.18],[4.01,.05]]});tone(sc[6+oi*2],x,{vol:.05,dur:2.6})},
       draw(t){
-        clear();const hz=H*.36;
-        lx.strokeStyle=`rgba(${LIGHT},.12)`;lx.lineWidth=1;lx.beginPath();lx.moveTo(0,hz);lx.lineTo(W,hz);lx.stroke();
-        if(Math.random()<.12+A.level*.9) rip.push({x:rand(W),y:rand(hz+10,H),r:0,max:rand(30,90)*(.6+A.level),a:.5+A.level*.5});
-        if(A.onset>.95) for(let i=0;i<3;i++) rip.push({x:rand(W),y:rand(hz+10,H),r:0,max:rand(80,180),a:.9});
-        rip=rip.filter(p=>p.r<p.max);
-        for(const p of rip){const depth=(p.y-hz)/(H-hz),k=1-p.r/p.max;p.r+=.6+depth*1.2;
-          lx.strokeStyle=`rgba(${LIGHT},${p.a*k*(.25+depth*.75)})`;lx.beginPath();lx.ellipse(p.x,p.y,p.r*(.4+depth),p.r*(.12+depth*.22),0,0,Math.PI*2);lx.stroke()}
+        clear();open+=(openT-open)*.06;flick*=.92;
+        const g=geo(),b=.16+A.level*.24+flick*.14;
+        // light bars
+        for(let i=0;i<g.slats;i++){
+          const ya=g.y0+i*g.bandH,yb=ya+g.bandH*open,ta=(ya-g.y0)/(g.bandH*g.slats),tb=(yb-g.y0)/(g.bandH*g.slats);
+          const xa=g.x0+ta*g.skew,xb=g.x0+tb*g.skew;
+          const gx=lx.createLinearGradient(xa,0,xa+g.w,0),fy=Math.sin(Math.PI*(i+.5)/g.slats);
+          gx.addColorStop(0,'rgba(246,236,214,0)');gx.addColorStop(.18,`rgba(246,236,214,${b*fy})`);gx.addColorStop(.7,`rgba(246,236,214,${b*fy*.8})`);gx.addColorStop(1,'rgba(246,236,214,0)');
+          lx.fillStyle=gx;lx.beginPath();lx.moveTo(xa,ya);lx.lineTo(xa+g.w,ya);lx.lineTo(xb+g.w,yb);lx.lineTo(xb,yb);lx.closePath();lx.fill();
+        }
+        // a soft glow over the whole window patch
+        const cx=g.x0+g.skew/2+g.w/2,cy=g.y0+g.bandH*g.slats/2,r=Math.max(g.w,g.bandH*g.slats)*.9;
+        lx.globalAlpha=.10+A.level*.12;lx.drawImage(glowSprite,cx-r,cy-r,r*2,r*2);lx.globalAlpha=1;
+        // dust: dim in shadow, bright where the light catches it
+        const T=t*.0004;
+        for(const m of motes){
+          m.vx+=Math.sin(T+m.p+m.y*.004)*.006+(A.onset>.9?rand(-.2,.2):0);m.vy+=Math.cos(T*.8+m.p+m.x*.003)*.006-.002;
+          m.vx*=.96;m.vy*=.96;m.x+=m.vx*m.s+.04;m.y+=m.vy*m.s;
+          if(m.x<-10)m.x=W+10;if(m.x>W+10)m.x=-10;if(m.y<-10)m.y=H+10;if(m.y>H+10)m.y=-10;
+          const L=lit(m.x,m.y),tw=.6+.4*Math.sin(t*.002+m.p);
+          const a=L?(.55+A.high*.45)*tw:.07;const sz=L?m.s*1.6:m.s;
+          lx.fillStyle=`rgba(${L?'250,240,220':LIGHT},${a})`;lx.fillRect(m.x,m.y,sz,sz);
+        }
       }}
   },
   /* 02 a column of light you can move, and tear down */
@@ -438,25 +474,45 @@ const INST={
           lx.fillStyle=`rgba(${LIGHT},${(.5-i*.017)*Math.min(1,vis+.15)})`;lx.fillRect(W/2-w/2+Math.sin(t*.002+i)*6,y,w,1)}
       }}
   },
-  /* 07 fog you can part, and sunlight you can let in */
+  /* 07 every shade of you in the sunlight: wipe the fog like a window and find a different shade of light underneath */
   fog(){
-    const b=Array.from({length:70},()=>({x:rand(-.2,1.2),y:rand(-.2,1.2),r:rand(.18,.45),vx:rand(-.00012,.00012),vy:rand(-.00006,.00006),px:0,py:0}));
-    const rays=[];const sc=SC(9,'major'); // A major
+    const b=Array.from({length:70},()=>({x:rand(-.2,1.2),y:rand(-.2,1.2),r:rand(.18,.45),vx:rand(-.00012,.00012),vy:rand(-.00006,.00006)}));
+    const sc=SC(9,'major'); // A major
+    // shades of sunlight, left to right: first light, morning, noon, gold, late gold, dusk
+    const SHADES=[[255,206,190],[255,224,166],[255,244,222],[255,200,112],[244,150,88],[196,118,146]];
+    const mask=document.createElement('canvas'),mg=mask.getContext('2d'); // alpha = how clear the glass is
+    const sun=document.createElement('canvas'),sg=sun.getContext('2d');
+    const S=.5;let lastNote=0,lx0=null,ly0=null,tick=0;
+    function size(){for(const c of [mask,sun]){c.width=Math.max(1,Math.ceil(W*S));c.height=Math.max(1,Math.ceil(H*S))}}
+    size();
+    function dab(px,py,r){const g=mg.createRadialGradient(px,py,0,px,py,r);g.addColorStop(0,'rgba(255,255,255,.5)');g.addColorStop(.6,'rgba(255,255,255,.25)');g.addColorStop(1,'rgba(255,255,255,0)');mg.fillStyle=g;mg.fillRect(px-r,py-r,r*2,r*2)}
+    function wipe(x,y){
+      const r=Math.min(W,H)*.08*S;
+      if(lx0==null)dab(x*S,y*S,r);
+      else{const n=Math.max(1,Math.ceil(Math.hypot(x-lx0,y-ly0)*S/(r*.35)));for(let i=1;i<=n;i++)dab((lx0+(x-lx0)*i/n)*S,(ly0+(y-ly0)*i/n)*S,r)}
+      lx0=x;ly0=y;
+      const now=performance.now();if(now-lastNote>150){lastNote=now;tone(pick(sc,y),x,{vol:.05,dur:2.4,attack:.08,partials:[[1,1],[2,.25]]})}
+    }
     return{
-      onUp(x,y,tap){if(tap){rays.push({x,born:performance.now()});tone(pick(sc,y),x,{vol:.06,dur:3.2,attack:.3,partials:[[1,1],[2,.3]]})}},
+      resize:size,
+      onDown(x,y){lx0=null;wipe(x,y)},onDrag(x,y){wipe(x,y)},onUp(){lx0=null},
       draw(t){
-        clear();const m=Math.max(W,H),on=dragging;
-        for(const f of b){
-          f.x+=f.vx*(1+A.level*3)+f.px;f.y+=f.vy+f.py;f.px*=.94;f.py*=.94;
-          if(on){const dx=f.x*W-P.x,dy=f.y*H-P.y,d=Math.hypot(dx,dy),R=f.r*m*.6;if(d<R){f.px+=dx/(d||1)*.0025;f.py+=dy/(d||1)*.0025}}
-          if(f.x<-.4)f.x=1.4;if(f.x>1.4)f.x=-.4;if(f.y<-.4)f.y=1.4;if(f.y>1.4)f.y=-.4;
-          lx.globalAlpha=.05+A.level*.16;const s=f.r*m*(1+A.bass*.3);lx.drawImage(fogSprite,f.x*W-s/2,f.y*H-s/2,s,s);
-        }
+        // fog, as before: it thickens as the room gets louder
+        clear();const M=Math.max(W,H);
+        for(const f of b){f.x+=f.vx*(1+A.level*3);f.y+=f.vy;if(f.x<-.4)f.x=1.4;if(f.x>1.4)f.x=-.4;
+          lx.globalAlpha=.05+A.level*.16;const s=f.r*M*(1+A.bass*.3);lx.drawImage(fogSprite,f.x*W-s/2,f.y*H-s/2,s,s)}
         lx.globalAlpha=1;
-        for(let i=rays.length-1;i>=0;i--){const r=rays[i],k=(performance.now()-r.born)/5000;if(k>=1){rays.splice(i,1);continue}
-          const a=Math.sin(Math.PI*k)*.35,w=Math.min(W,H)*.12;
-          const g=lx.createLinearGradient(0,0,0,H);g.addColorStop(0,`rgba(246,224,182,${a})`);g.addColorStop(1,'rgba(246,224,182,0)');
-          lx.fillStyle=g;lx.beginPath();lx.moveTo(r.x-w*.3,0);lx.lineTo(r.x+w*.3,0);lx.lineTo(r.x+w*1.2,H);lx.lineTo(r.x-w*1.2,H);lx.closePath();lx.fill()}
+        // the light behind the glass: a different shade in every place
+        const sw=sun.width,sh=sun.height;
+        sg.globalCompositeOperation='source-over';
+        const g=sg.createLinearGradient(0,0,sw,sh*.4);SHADES.forEach((c,i)=>g.addColorStop(i/(SHADES.length-1),`rgb(${c})`));
+        sg.fillStyle=g;sg.fillRect(0,0,sw,sh);
+        const v=sg.createLinearGradient(0,0,0,sh);v.addColorStop(0,'rgba(255,255,255,.22)');v.addColorStop(.6,'rgba(255,255,255,0)');v.addColorStop(1,'rgba(60,30,20,.45)');sg.fillStyle=v;sg.fillRect(0,0,sw,sh);
+        const rs=Math.max(sw,sh)*.45;sg.globalAlpha=.4+A.level*.5;sg.drawImage(glowSprite,sw*(.5+Math.sin(t*.00025)*.25)-rs,sh*.3-rs,rs*2,rs*2);sg.globalAlpha=1;
+        sg.globalCompositeOperation='destination-in';sg.drawImage(mask,0,0);sg.globalCompositeOperation='source-over';
+        lx.drawImage(sun,0,0,W,H);
+        // the glass slowly fogs back over
+        if(++tick%30===0){mg.globalCompositeOperation='destination-out';mg.fillStyle='rgba(0,0,0,.12)';mg.fillRect(0,0,mask.width,mask.height);mg.globalCompositeOperation='source-over'}
       }}
   },
   /* 08 wind, with chimes the visitor hangs */
@@ -612,7 +668,13 @@ cv.addEventListener('pointerup',pUp);cv.addEventListener('pointercancel',pUp);
 
 /* ---------- exhibition flow ---------- */
 let state='entrance',idx=0,cur=null,overlay=null,visitStart=0,visit=0;
-const spent=ROOMS.map(()=>0);let lastT=0;
+const BINS=120;
+const spent=ROOMS.map(()=>0), heard=ROOMS.map(()=>new Uint8Array(BINS));let lastT=0,lastSave=0;
+(function restore(){try{const d=JSON.parse(sessionStorage.getItem('atp-visit')||'null');if(!d||d.n!==ROOMS.length)return;
+  visitStart=d.start||0;d.spent.forEach((v,i)=>spent[i]=v);d.heard.forEach((str,i)=>{for(let k=0;k<BINS&&k<str.length;k++)heard[i][k]=str[k]==='1'?1:0})}catch(_){}})();
+function saveVisit(){try{sessionStorage.setItem('atp-visit',JSON.stringify({n:ROOMS.length,start:visitStart,spent,heard:heard.map(h=>Array.from(h).join(''))}))}catch(_){}}
+const hasHistory=()=>spent.some(v=>v>1);
+$('ticketBtn').hidden=!hasHistory();
 
 function enterRoom(i){
   idx=i;const r=ROOMS[i];
@@ -629,6 +691,7 @@ function enterRoom(i){
   au.src=r.file;au.currentTime=0;lastT=0;
   master&&master.gain.setValueAtTime(1,actx.currentTime);
   state='playing';P.lastMove=performance.now();P.still=0;
+  $('prevBtn').disabled=i===0;$('skipBtn').textContent=i===ROOMS.length-1?'Exit →':'Next →';
   au.play().catch(()=>{$('pauseBtn').textContent='Play'});$('pauseBtn').textContent='Pause';
   showUI();
 }
@@ -647,7 +710,9 @@ function leaveRoom(){
 }
 au.addEventListener('timeupdate',()=>{
   if(state!=='playing')return;
-  const d=au.currentTime-lastT; if(d>0&&d<2)spent[idx]+=d; lastT=au.currentTime;
+  const T=au.currentTime,D=au.duration||ROOMS[idx].duration,d=T-lastT;
+  if(d>0&&d<2){spent[idx]+=d;const a=Math.floor(lastT/D*BINS),b=Math.min(BINS-1,Math.floor(T/D*BINS));for(let k=Math.max(0,a);k<=b;k++)heard[idx][k]=1}
+  lastT=T;if(performance.now()-lastSave>3000){lastSave=performance.now();saveVisit()}
   $('prog').style.width=(progress()*100)+'%';
   $('time').textContent=fmt(au.currentTime)+' / '+fmt(au.duration||ROOMS[idx].duration);
 });
@@ -676,18 +741,37 @@ $('clockBtn').addEventListener('click',()=>{
   const v=++visit;
   setTimeout(()=>{if(v!==visit)return;
     $('entrance').hidden=true;$('room').hidden=false;$('exit').hidden=true;
-    visitStart=Date.now();spent.fill(0);
+    if(!visitStart)visitStart=Date.now();
     resize();enterRoom(0);
   },reduced?900:3600);
 });
 $('dBtn').addEventListener('click',()=>{actx&&actx.resume();enterRoom(idx+1)});
 $('skipBtn').addEventListener('click',leaveRoom);
+function goToRoom(i){
+  if(i<0||i>=ROOMS.length)return;
+  visit++;au.pause();dragging=false;actx&&actx.resume();
+  $('room').classList.add('dark');$('door').classList.remove('show');
+  ['label','controls','time','scrim'].forEach(id=>$(id).classList.add('hide'));state='moving';
+  const v=visit;setTimeout(()=>{if(v===visit)enterRoom(i)},reduced?100:700);
+}
+$('prevBtn').addEventListener('click',()=>goToRoom(idx-1));
+$('dAgain').addEventListener('click',()=>goToRoom(idx));
+let homeArm=0;
+$('homeBtn').addEventListener('click',()=>{
+  const b=$('homeBtn');
+  if(performance.now()-homeArm<3000){homeArm=0;b.textContent='Entrance';b.classList.remove('confirm');toEntrance();return}
+  homeArm=performance.now();b.textContent='Leave? Tap again';b.classList.add('confirm');
+  setTimeout(()=>{if(performance.now()-homeArm>=2900){b.textContent='Entrance';b.classList.remove('confirm')}},3000);
+});
+window.__atp={state:()=>state,goToRoom:i=>goToRoom(i),toEntrance:()=>toEntrance()}; // handy for testing
+$('ticketBtn').addEventListener('click',()=>{visit++;$('entrance').hidden=true;toExit()});
 function toEntrance(){
+  saveVisit();$('ticketBtn').hidden=!hasHistory();
   visit++;state='entrance';au.pause();if(cur&&cur.dispose)cur.dispose();cur=null;overlay=null;clearTimeout(uiTimer);dragging=false;
   $('door').classList.remove('show');$('room').hidden=true;$('exit').hidden=true;$('entrance').hidden=false;$('entrance').scrollTop=0;
   sweep=null;$('entry').classList.remove('gone');$('press').textContent='Press the clock to enter';requestAnimationFrame(clockTick);
 }
-$('homeBtn').addEventListener('click',toEntrance);$('dHome').addEventListener('click',toEntrance);
+$('dHome').addEventListener('click',toEntrance);
 $('pauseBtn').addEventListener('click',()=>{
   if(au.paused){actx&&actx.resume();au.play();$('pauseBtn').textContent='Pause';showUI()}
   else{au.pause();$('pauseBtn').textContent='Play';showUI();clearTimeout(uiTimer)}
@@ -696,6 +780,7 @@ addEventListener('keydown',e=>{
   if(state==='playing'){
     if(e.code==='Space'){e.preventDefault();$('pauseBtn').click()}
     if(e.code==='ArrowRight')leaveRoom();
+    if(e.code==='ArrowLeft')goToRoom(idx-1);
   }
 });
 addEventListener('resize',()=>{if(state!=='entrance')resize()});
@@ -715,10 +800,11 @@ requestAnimationFrame(frame);
 const links=$('links');
 [['Spotify',EX.links.spotify],['Instagram',EX.links.instagram]].forEach(([n,u])=>{const a=document.createElement('a');a.href=u;a.target='_blank';a.rel='noopener';a.textContent=n;links.appendChild(a)});
 function toExit(){
-  state='exit';if(cur&&cur.dispose)cur.dispose();cur=null;
+  state='exit';$('entrance').hidden=true;if(cur&&cur.dispose)cur.dispose();cur=null;
   $('room').hidden=true;$('exit').hidden=false;$('exit').scrollTop=0;
   const ol=$('creditList');ol.innerHTML='';
-  ROOMS.forEach((r,i)=>{const li=document.createElement('li');li.innerHTML=`<span>${pad(i+1)}&nbsp;&nbsp;</span>`;li.firstChild.append(r.title);const s=document.createElement('span');s.textContent=spent[i]>1?`heard ${fmt(spent[i])}`:'passed through';li.append(s);ol.append(li)});
+  saveVisit();
+  ROOMS.forEach((r,i)=>{const li=document.createElement('li');li.innerHTML=`<span>${pad(i+1)}&nbsp;&nbsp;</span>`;li.firstChild.append(r.title);const s=document.createElement('span');s.textContent=spent[i]>1?`heard ${fmt(spent[i])}`:'not yet';li.append(s);ol.append(li)});
   document.fonts.ready.then(drawTicket);
 }
 let ticketURL='';
@@ -742,9 +828,9 @@ function drawTicket(){
   const wx=64,ww=stubX-128,wy=372,wh=92;let x=wx;
   g.fillStyle='rgba(20,19,18,.18)';g.fillRect(wx,wy,ww,1);
   ROOMS.forEach((r,i)=>{
-    const pk=(r.peaks&&r.peaks.length)?r.peaks:Array(60).fill(.3), rw=ww*r.duration/totalDur, heard=Math.min(1,spent[i]/r.duration), n=pk.length;
+    const pk=(r.peaks&&r.peaks.length)?r.peaks:Array(60).fill(.3), rw=ww*r.duration/totalDur, n=pk.length;
     for(let k=0;k<n;k++){const px=x+rw*k/n,bw=Math.max(1,rw/n-1.2),v=pk[k];
-      const on=k/n<heard; g.fillStyle=on?ink:'rgba(20,19,18,.16)'; const hh=Math.max(1,v*wh*(on?1:.35)); g.fillRect(px,wy-hh,bw,hh*2)}
+      const on=heard[i][Math.min(BINS-1,Math.floor(k/n*BINS))]===1; g.fillStyle=on?ink:'rgba(20,19,18,.16)'; const hh=Math.max(1,v*wh*(on?1:.35)); g.fillRect(px,wy-hh,bw,hh*2)}
     g.fillStyle='rgba(20,19,18,.5)';g.font='400 13px "Zen Kaku Gothic New", Arial, sans-serif';g.fillText(pad(i+1),x+2,wy+wh+30);
     g.fillStyle='rgba(20,19,18,.25)';g.fillRect(x,wy+wh+8,1,10);
     x+=rw;

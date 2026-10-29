@@ -17,7 +17,7 @@ window.ROOMS = [
   "title": "everyday melancholy",
   "release": "Single",
   "date": "Apr 11, 2025",
-  "installation": "rain",
+  "installation": "blinds",
   "statement": "Bedroom boredom.",
   "attribution": "",
   "statementIsTemp": false,
